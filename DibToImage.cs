@@ -28,113 +28,105 @@
  * 
  * PLEASE SEND EMAIL TO:  twain@saraff.ru.
  */
+
 using System;
-using System.Runtime.InteropServices;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
+namespace Saraff.Twain
+{
+    internal sealed class DibToImage : _ImageHandler
+    {
+        /// <summary>
+        ///     Gets the size of the buffer.
+        /// </summary>
+        /// <value>
+        ///     The size of the buffer.
+        /// </value>
+        protected override int BufferSize => 256 * 1024; //256K
 
-namespace Saraff.Twain {
-
-    internal sealed class DibToImage:_ImageHandler {
+        private BITMAPINFOHEADER Header
+        {
+            get
+            {
+                if (!HandlerState.ContainsKey("BITMAPINFOHEADER"))
+                    HandlerState.Add("BITMAPINFOHEADER",
+                        Marshal.PtrToStructure(ImagePointer, typeof(BITMAPINFOHEADER)));
+                return HandlerState["BITMAPINFOHEADER"] as BITMAPINFOHEADER;
+            }
+        }
 
         /// <summary>
-        /// Convert a block of unmanaged memory to stream.
+        ///     Convert a block of unmanaged memory to stream.
         /// </summary>
         /// <param name="ptr">The pointer to block of unmanaged memory.</param>
         /// <param name="stream"></param>
-        protected override void PtrToStreamCore(IntPtr ptr,Stream stream) {
-            BinaryWriter _writer = new BinaryWriter(stream);
+        protected override void PtrToStreamCore(IntPtr ptr, Stream stream)
+        {
+            var writer = new BinaryWriter(stream);
 
             #region BITMAPFILEHEADER
 
-            BITMAPINFOHEADER _header = this.Header;
+            var header = Header;
 
-            _writer.Write((ushort)0x4d42);
-            _writer.Write(14 + this.GetSize());
-            _writer.Write(0);
-            _writer.Write(14 + _header.biSize + (_header.ClrUsed << 2));
+            writer.Write((ushort)0x4d42);
+            writer.Write(14 + GetSize());
+            writer.Write(0);
+            writer.Write(14 + header.biSize + (header.ClrUsed << 2));
 
             #endregion
 
             #region BITMAPINFO and pixel data
 
-            base.PtrToStreamCore(ptr,stream);
+            base.PtrToStreamCore(ptr, stream);
 
             #endregion
-
         }
 
         /// <summary>
-        /// Gets the size of a image data.
+        ///     Gets the size of a image data.
         /// </summary>
         /// <returns>
-        /// Size of a image data.
+        ///     Size of a image data.
         /// </returns>
-        protected override int GetSize() {
-            if(!this.HandlerState.ContainsKey("DIBSIZE")) {
-                BITMAPINFOHEADER _header = this.Header;
+        protected override int GetSize()
+        {
+            if (HandlerState.ContainsKey("DIBSIZE"))
+                return (int)HandlerState["DIBSIZE"];
+            var header = Header;
 
-                int _extra = 0;
-                if(_header.biCompression == 0) {
-                    int _bytesPerRow = ((_header.biWidth * _header.biBitCount) >> 3);
-                    _extra = Math.Max(_header.biHeight * (_bytesPerRow + ((_bytesPerRow & 0x3) != 0 ? 4 - _bytesPerRow & 0x3 : 0)) - _header.biSizeImage,0);
-                }
-
-                this.HandlerState.Add("DIBSIZE",_header.biSize + _header.biSizeImage + _extra + (_header.ClrUsed << 2));
+            var extra = 0;
+            if (header.biCompression == 0)
+            {
+                var bytesPerRow = (header.biWidth * header.biBitCount) >> 3;
+                extra = Math.Max(
+                    header.biHeight * (bytesPerRow + ((bytesPerRow & 0x3) != 0 ? (4 - bytesPerRow) & 0x3 : 0)) -
+                    header.biSizeImage, 0);
             }
-            return (int)this.HandlerState["DIBSIZE"];
+
+            HandlerState.Add("DIBSIZE", header.biSize + header.biSizeImage + extra + (header.ClrUsed << 2));
+
+            return (int)HandlerState["DIBSIZE"];
         }
 
-        /// <summary>
-        /// Gets the size of the buffer.
-        /// </summary>
-        /// <value>
-        /// The size of the buffer.
-        /// </value>
-        protected override int BufferSize {
-            get {
-                return 256 * 1024; //256K
-            }
-        }
-
-        private BITMAPINFOHEADER Header {
-            get {
-                if(!this.HandlerState.ContainsKey("BITMAPINFOHEADER")) {
-                    this.HandlerState.Add("BITMAPINFOHEADER",Marshal.PtrToStructure(this.ImagePointer,typeof(BITMAPINFOHEADER)));
-                }
-                return this.HandlerState["BITMAPINFOHEADER"] as BITMAPINFOHEADER;
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential,Pack=2)]
-        private class BITMAPINFOHEADER {
-            public int biSize;
-            public int biWidth;
+        [StructLayout(LayoutKind.Sequential, Pack = 2)]
+        private class BITMAPINFOHEADER
+        {
+            public short biBitCount;
+            public int biClrImportant;
+            private int biClrUsed;
+            public int biCompression;
             public int biHeight;
             public short biPlanes;
-            public short biBitCount;
-            public int biCompression;
+            public int biSize;
             public int biSizeImage;
+            public int biWidth;
             public int biXPelsPerMeter;
             public int biYPelsPerMeter;
-            public int biClrUsed;
-            public int biClrImportant;
 
-            public int ClrUsed {
-                get {
-                    return this.IsRequiredCreateColorTable ? 1<<this.biBitCount : this.biClrUsed;
-                }
-            }
+            public int ClrUsed => IsRequiredCreateColorTable ? 1 << biBitCount : biClrUsed;
 
-            public bool IsRequiredCreateColorTable {
-                get {
-                    return this.biClrUsed==0&&this.biBitCount<=8;
-                }
-            }
+            private bool IsRequiredCreateColorTable => biClrUsed == 0 && biBitCount <= 8;
         }
     }
 }

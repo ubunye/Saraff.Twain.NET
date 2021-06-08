@@ -28,95 +28,131 @@
  * 
  * PLEASE SEND EMAIL TO:  twain@saraff.ru.
  */
+
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Security.Permissions;
 
-namespace Saraff.Twain {
-
+namespace Saraff.Twain
+{
     /// <summary>
-    /// Exception class <see cref="TwainException"/>
-    /// <para xml:lang="ru">Класс исключения <see cref="TwainException"/></para>
+    ///     Exception class <see cref="TwainException" />
+    ///     <para xml:lang="ru">Класс исключения <see cref="TwainException" /></para>
     /// </summary>
     [Serializable]
     [DebuggerDisplay("{Message}; ReturnCode = {ReturnCode}; ConditionCode = {ConditionCode}")]
-    public sealed class TwainException:Exception {
-
+    public sealed class TwainException : Exception
+    {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TwainException"/> class.
+        ///     Initializes a new instance of the <see cref="TwainException" /> class.
         /// </summary>
         /// <param name="cc">The condition code.</param>
         /// <param name="rc">The return code.</param>
-        internal TwainException(TwCC cc,TwRC rc):this(TwainException._CodeToMessage(cc)) {
-            this.ConditionCode=cc;
-            this.ReturnCode=rc;
+        internal TwainException(TwCC cc, TwRC rc) : this(_CodeToMessage(cc))
+        {
+            ConditionCode = cc;
+            ReturnCode = rc;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TwainException"/> class.
+        ///     Initializes a new instance of the <see cref="TwainException" /> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        internal TwainException(string message) : base(message) {
+        internal TwainException(string message) : base(message)
+        {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TwainException"/> class.
+        ///     Initializes a new instance of the <see cref="TwainException" /> class.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">Inner exception.</param>
-        internal TwainException(string message,Exception innerException):base(message,innerException) {
+        internal TwainException(string message, Exception innerException) : base(message, innerException)
+        {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TwainException"/> class.
+        ///     Initializes a new instance of the <see cref="TwainException" /> class.
         /// </summary>
-        /// <param name="info">An object <see cref="T:System.Runtime.Serialization.SerializationInfo" />, containing serialized object data about the thrown exception.<para xml:lang="ru">Объект <see cref="T:System.Runtime.Serialization.SerializationInfo" />, содержащий сериализованные данные объекта о выбрасываемом исключении.</para></param>
-        /// <param name="context">An object <see cref="T:System.Runtime.Serialization.StreamingContext" />, containing contextual information about the source or destination.<para xml:lang="ru">Объект <see cref="T:System.Runtime.Serialization.StreamingContext" />, содержащий контекстные сведения об источнике или назначении.</para></param>
-        internal TwainException(SerializationInfo info,StreamingContext context) : base(info,context) {
-            this.ConditionCode=(TwCC)info.GetValue("ConditionCode",typeof(TwCC));
-            this.ReturnCode=(TwRC)info.GetValue("ReturnCode",typeof(TwRC));
+        /// <param name="info">
+        ///     An object <see cref="T:System.Runtime.Serialization.SerializationInfo" />, containing serialized object data about
+        ///     the thrown exception.
+        ///     <para xml:lang="ru">
+        ///         Объект <see cref="T:System.Runtime.Serialization.SerializationInfo" />, содержащий
+        ///         сериализованные данные объекта о выбрасываемом исключении.
+        ///     </para>
+        /// </param>
+        /// <param name="context">
+        ///     An object <see cref="T:System.Runtime.Serialization.StreamingContext" />, containing contextual information about
+        ///     the source or destination.
+        ///     <para xml:lang="ru">
+        ///         Объект <see cref="T:System.Runtime.Serialization.StreamingContext" />, содержащий контекстные
+        ///         сведения об источнике или назначении.
+        ///     </para>
+        /// </param>
+        internal TwainException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            ConditionCode = (TwCC)info.GetValue("ConditionCode", typeof(TwCC));
+            ReturnCode = (TwRC)info.GetValue("ReturnCode", typeof(TwRC));
         }
 
         /// <summary>
-        /// When overridden in a derived class, sets the exception information for <see cref="T:System.Runtime.Serialization.SerializationInfo" />.
-        /// <para xml:lang="ru">При переопределении в производном классе задает сведения об исключении для <see cref="T:System.Runtime.Serialization.SerializationInfo" />.</para>
+        ///     Returns the operation status code. Get condition code.
+        ///     <para xml:lang="ru">Возвращает код состояния операции. Get condition code.</para>
         /// </summary>
-        /// <param name="info">An object <see cref="T:System.Runtime.Serialization.SerializationInfo" />, containing serialized object data about the thrown exception.<para xml:lang="ru">Объект <see cref="T:System.Runtime.Serialization.SerializationInfo" />, содержащий сериализованные данные объекта о выбрасываемом исключении.</para></param>
-        /// <param name="context">An object <see cref="T:System.Runtime.Serialization.StreamingContext" />, containing contextual information about the source or destination.<para xml:lang="ru">Объект <see cref="T:System.Runtime.Serialization.StreamingContext" />, содержащий контекстные сведения об источнике или назначении.</para></param>
+        public TwCC ConditionCode { get; private set; }
+
+        /// <summary>
+        ///     Returns the result code of the operation. Get return code.
+        ///     <para xml:lang="ru">Возвращает код результата операции. Get return code.</para>
+        /// </summary>
+        public TwRC ReturnCode { get; private set; }
+
+        /// <summary>
+        ///     When overridden in a derived class, sets the exception information for
+        ///     <see cref="T:System.Runtime.Serialization.SerializationInfo" />.
+        ///     <para xml:lang="ru">
+        ///         При переопределении в производном классе задает сведения об исключении для
+        ///         <see cref="T:System.Runtime.Serialization.SerializationInfo" />.
+        ///     </para>
+        /// </summary>
+        /// <param name="info">
+        ///     An object <see cref="T:System.Runtime.Serialization.SerializationInfo" />, containing serialized object data about
+        ///     the thrown exception.
+        ///     <para xml:lang="ru">
+        ///         Объект <see cref="T:System.Runtime.Serialization.SerializationInfo" />, содержащий
+        ///         сериализованные данные объекта о выбрасываемом исключении.
+        ///     </para>
+        /// </param>
+        /// <param name="context">
+        ///     An object <see cref="T:System.Runtime.Serialization.StreamingContext" />, containing contextual information about
+        ///     the source or destination.
+        ///     <para xml:lang="ru">
+        ///         Объект <see cref="T:System.Runtime.Serialization.StreamingContext" />, содержащий контекстные
+        ///         сведения об источнике или назначении.
+        ///     </para>
+        /// </param>
         /// <PermissionSet>
-        ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Read="*AllFiles*" PathDiscovery="*AllFiles*" />
-        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="SerializationFormatter" />
+        ///     <IPermission
+        ///         class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        ///         version="1" Read="*AllFiles*" PathDiscovery="*AllFiles*" />
+        ///     <IPermission
+        ///         class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+        ///         version="1" Flags="SerializationFormatter" />
         /// </PermissionSet>
-        [SecurityPermission(SecurityAction.Demand,SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info,StreamingContext context) {
-            base.GetObjectData(info,context);
-            info.AddValue("ConditionCode",this.ConditionCode);
-            info.AddValue("ReturnCode",this.ReturnCode);
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("ConditionCode", ConditionCode);
+            info.AddValue("ReturnCode", ReturnCode);
         }
 
-        /// <summary>
-        /// Returns the operation status code. Get condition code.
-        /// <para xml:lang="ru">Возвращает код состояния операции. Get condition code.</para>
-        /// </summary>
-        public TwCC ConditionCode {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Returns the result code of the operation. Get return code.
-        /// <para xml:lang="ru">Возвращает код результата операции. Get return code.</para>
-        /// </summary>
-        public TwRC ReturnCode {
-            get;
-            private set;
-        }
-
-        private static string _CodeToMessage(TwCC code) {
-            switch(code) {
+        private static string _CodeToMessage(TwCC code)
+        {
+            switch (code)
+            {
                 case TwCC.Success:
                     return "It worked!";
                 case TwCC.Bummer:
@@ -144,7 +180,7 @@ namespace Saraff.Twain {
                 case TwCC.CapBadOperation:
                     return "Operation not supported by capability.";
                 case TwCC.CapSeqError:
-                    return "Capability has dependancy on other capability.";
+                    return "Capability has dependency on other capability.";
                 /* Added 1.8 */
                 case TwCC.Denied:
                     return "File System operation is denied (file is protected).";
