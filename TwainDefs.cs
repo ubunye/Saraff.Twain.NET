@@ -2904,7 +2904,7 @@ namespace Saraff.Twain
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
     internal class TwUserInterface
-    {						    // TW_USERINTERFACE
+    {                           // TW_USERINTERFACE
 
         /// <summary>
         /// TRUE if DS should bring up its UI
@@ -3839,19 +3839,6 @@ namespace Saraff.Twain
         public UIntPtr RefCon;
 
         public short Message;
-    }
-
-    /// <summary>
-    /// Allows for a data source and application to pass custom data to each other.
-    /// </summary>
-    /// <remarks>TW_CUSTOMDSDATA</remarks>
-    [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwCustomDSData
-    {
-
-        public uint InfoLength;
-
-        public IntPtr hData;
     }
 
     [return: MarshalAs(UnmanagedType.U2)]

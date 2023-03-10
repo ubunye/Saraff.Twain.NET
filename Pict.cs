@@ -1,6 +1,8 @@
-﻿namespace Saraff.Twain {
+﻿namespace Saraff.Twain
+{
 
-    internal sealed class Pict : _ImageHandler {
+    internal sealed class Pict : _ImageHandler
+    {
 
         /// <summary>
         /// Gets the size of a image data.

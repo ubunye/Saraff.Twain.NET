@@ -1,19 +1,4 @@
-﻿/* Этот файл является частью библиотеки Saraff.Twain.NET
- * © SARAFF SOFTWARE (Кирножицкий Андрей), 2011.
- * Saraff.Twain.NET - свободная программа: вы можете перераспространять ее и/или
- * изменять ее на условиях Меньшей Стандартной общественной лицензии GNU в том виде,
- * в каком она была опубликована Фондом свободного программного обеспечения;
- * либо версии 3 лицензии, либо (по вашему выбору) любой более поздней
- * версии.
- * Saraff.Twain.NET распространяется в надежде, что она будет полезной,
- * но БЕЗО ВСЯКИХ ГАРАНТИЙ; даже без неявной гарантии ТОВАРНОГО ВИДА
- * или ПРИГОДНОСТИ ДЛЯ ОПРЕДЕЛЕННЫХ ЦЕЛЕЙ. Подробнее см. в Меньшей Стандартной
- * общественной лицензии GNU.
- * Вы должны были получить копию Меньшей Стандартной общественной лицензии GNU
- * вместе с этой программой. Если это не так, см.
- * <http://www.gnu.org/licenses/>.)
- * 
- * This file is part of Saraff.Twain.NET.
+﻿/* This file is part of Saraff.Twain.NET.
  * © SARAFF SOFTWARE (Kirnazhytski Andrei), 2011.
  * Saraff.Twain.NET is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -35,13 +20,15 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Media.Imaging;
+using Message = System.Windows.Forms.Message;
 
 namespace Saraff.Twain
 {
 
     /// <summary>
     /// Provides the ability to work with TWAIN sources.
-    /// <para xml:lang="ru">Обеспечивает возможность работы с TWAIN-источниками.</para>
+    /// <para xml:lang="ru"></para>
     /// </summary>
     [ToolboxBitmap(typeof(Twain32), "Resources.scanner.bmp")]
     [DebuggerDisplay("ProductName = {_appid.ProductName.Value}, Version = {_appid.Version.Info}, DS = {_srcds.ProductName}")]
@@ -50,14 +37,14 @@ namespace Saraff.Twain
     public sealed class Twain32 : Component
     {
         private _DsmEntry _dsmEntry;
-        private IntPtr _hTwainDll; //module descriptor twain_32.dll / дескриптор модуля twain_32.dll
+        private IntPtr _hTwainDll; //module descriptor twain_32.dll 
         private IContainer _components = new Container();
-        private IntPtr _hwnd; //handle to the parent window / дескриптор родительского окна.
-        private TwIdentity _appid; //application identifier / идентификатор приложения.
-        private TwIdentity _srcds; //identifier of the current data source / идентификатор текущего источника данных.
-        private _MessageFilter _filter; //WIN32 event filter / фильтр событий WIN32
-        private TwIdentity[] _sources = new TwIdentity[0]; //an array of available data sources / массив доступных источников данных.
-        private ApplicationContext _context = null; //application context. used if there is no main message processing cycle / контекст приложения. используется в случае отсутствия основного цикла обработки сообщений.
+        private IntPtr _hwnd; //handle to the parent window 
+        private TwIdentity _appid; //application identifier
+        private TwIdentity _srcds; //identifier of the current data source
+        private _MessageFilter _filter; //WIN32 event filter 
+        private TwIdentity[] _sources = new TwIdentity[0]; //an array of available data sources
+        private ApplicationContext _context = null; //application context. used if there is no main message processing cycle 
         private Collection<_Image> _images = new Collection<_Image>();
         private TwainStateFlag _twainState;
         private bool _isTwain2Enable = IntPtr.Size != 4 || Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX;
@@ -83,6 +70,7 @@ namespace Saraff.Twain
                     break;
                 default:
                     Form _window = new Form();
+                    _window.TopMost = true;
                     _components.Add(_window);
                     _hwnd = _window.Handle;
                     break;
@@ -127,9 +115,9 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Opens the data source manager
-        /// <para xml:lang="ru">Открывает менеджер источников данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru">Истина, если операция прошла удачно; иначе, лож.</para></returns>
+        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru"></para></returns>
         public bool OpenDSM()
         {
             if ((_TwainState & TwainStateFlag.DSMOpen) == 0)
@@ -207,9 +195,9 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Displays a dialog box for selecting a data source.
-        /// <para xml:lang="ru">Отображает диалоговое окно для выбора источника данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru">Истина, если операция прошла удачно; иначе, лож.</para></returns>
+        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru"></para></returns>
         public bool SelectSource()
         {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
@@ -243,9 +231,9 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Opens a data source.
-        /// <para xml:lang="ru">Открывает источник данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru">Истина, если операция прошла удачно; иначе, лож.</para></returns>
+        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru"></para></returns>
         public bool OpenDataSource()
         {
             if ((_TwainState & TwainStateFlag.DSMOpen) != 0 && (_TwainState & TwainStateFlag.DSOpen) == 0)
@@ -276,7 +264,7 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Registers a data source event handler.
-        /// <para xml:lang="ru">Регестрирует обработчик событий источника данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
         private void _RegisterCallback()
         {
@@ -293,9 +281,9 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Activates a data source.
-        /// <para xml:lang="ru">Активирует источник данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru">Истина, если операция прошла удачно; иначе, лож.</para></returns>
+        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru"></para></returns>
         private bool _EnableDataSource()
         {
             if ((_TwainState & TwainStateFlag.DSOpen) != 0 && (_TwainState & TwainStateFlag.DSEnabled) == 0)
@@ -307,6 +295,7 @@ namespace Saraff.Twain
                     ParentHand = _hwnd
                 };
                 for (TwRC _rc = _dsmEntry.DsInvoke(_AppId, _srcds, TwDG.Control, TwDAT.UserInterface, TwMSG.EnableDS, ref _guif); _rc != TwRC.Success;)
+
                 {
                     throw new TwainException(_GetTwainStatus(), _rc);
                 }
@@ -324,7 +313,7 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Gets an image from a data source.
-        /// <para xml:lang="ru">Получает изображение с источника данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
         public void Acquire()
         {
@@ -357,9 +346,9 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Deactivates the data source.
-        /// <para xml:lang="ru">Деактивирует источник данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru">Истина, если операция прошла удачно; иначе, лож.</para></returns>
+        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru"></para></returns>
         private bool _DisableDataSource()
         {
             if ((_TwainState & TwainStateFlag.DSEnabled) != 0)
@@ -393,9 +382,9 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Closes the data source.
-        /// <para xml:lang="ru">Закрывает источник данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru">Истина, если операция прошла удачно; иначе, лож.</para></returns>
+        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru"></para></returns>
         public bool CloseDataSource()
         {
             if ((_TwainState & TwainStateFlag.DSOpen) != 0 && (_TwainState & TwainStateFlag.DSEnabled) == 0)
@@ -413,9 +402,9 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Closes the data source manager.
-        /// <para xml:lang="ru">Закрывает менежер источников данных.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru">Истина, если операция прошла удачно; иначе, лож.</para></returns>
+        /// <returns>True if the operation was successful; otherwise, false.<para xml:lang="ru"></para></returns>
         public bool CloseDSM()
         {
             if ((_TwainState & TwainStateFlag.DSEnabled) != 0)
@@ -451,31 +440,36 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Returns the scanned image.
-        /// <para xml:lang="ru">Возвращает отсканированое изображение.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
-        /// <param name="index">Image index.<para xml:lang="ru">Индекс изображения.</para></param>
-        /// <returns>Instance of the image.<para xml:lang="ru">Экземпляр изображения.</para></returns>
-        public Image GetImage(int index) => _images[index];
+        /// <param name="index">Image index.</param>
+        /// <returns>Instance of the image.</para></returns>
+        public Image GetImage(int index)
+        {
+            return _images[index];
+        }
 
         /// <summary>
         /// Returns the number of scanned images.
-        /// <para xml:lang="ru">Возвращает количество отсканированных изображений.</para>
+        /// <para xml:lang="ru"></para>
         /// </summary>
         [Browsable(false)]
         public int ImageCount => _images.Count;
 
         /// <summary>
         /// Gets or sets a value indicating the need to deactivate the data source after receiving the image.
-        /// <para xml:lang="ru">Возвращает или устанавливает значение, указывающее на необходимость деактивации источника данных после получения изображения.</para>
         /// </summary>
         [DefaultValue(true)]
         [Category("Behavior")]
         [Description("Gets or sets a value indicating the need to deactivate the data source after receiving the image. Возвращает или устанавливает значение, указывающее на необходимость деактивации источника данных после получения изображения.")]
-        public bool DisableAfterAcquire { get; set; }
+        public bool DisableAfterAcquire
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether to use TWAIN 2.0.
-        /// <para xml:lang="ru">Возвращает или устанавливает значение, указывающее на необходимость использования TWAIN 2.0.</para>
         /// </summary>
         [DefaultValue(false)]
         [Category("Behavior")]
@@ -516,7 +510,6 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Returns true if DSM supports TWAIN 2.0; otherwise false.
-        /// <para xml:lang="ru">Возвращает истину, если DSM поддерживает TWAIN 2.0; иначе лож.</para>
         /// </summary>
         [Browsable(false)]
         public bool IsTwain2Supported
@@ -535,7 +528,6 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Gets or sets the index of the current data source.
-        /// <para xml:lang="ru">Возвращает или устанавливает индекс текущего источника данных.</para>
         /// </summary>
         [Browsable(false)]
         [ReadOnly(true)]
@@ -570,52 +562,76 @@ namespace Saraff.Twain
                     }
                     else
                     {
-                        throw new TwainException("The data source is already open. Источник данных уже открыт.");
+                        throw new TwainException("The data source is already open.");
                     }
                 }
                 else
                 {
-                    throw new TwainException("Data Source Manager is not open. Менеджер источников данных не открыт.");
+                    throw new TwainException("Data Source Manager is not open.");
                 }
             }
         }
 
         /// <summary>
         /// Returns the number of data sources.
-        /// <para xml:lang="ru">Возвращает количество источников данных.</para>
         /// </summary>
         [Browsable(false)]
         public int SourcesCount => _sources.Length;
 
         /// <summary>
-        /// Returns the name of the data source at the specified index.
-        /// <para xml:lang="ru">Возвращает имя источника данных по указанному индексу.</para>
+        /// Returns the manufacturer name of the data source at the specified index.
         /// </summary>
-        /// <param name="index">Index.<para xml:lang="ru">Индекс.</para></param>
-        /// <returns>The name of the data source.<para xml:lang="ru">Имя источника данных.</para></returns>
-        public string GetSourceProductName(int index) => _sources[index].ProductName;
+        /// <returns>The manufacturer name of the data source.</returns>
+        public string GetSourceManufacturerName(int index)
+        {
+            return _sources[index].Manufacturer;
+        }
+
+        /// <summary>
+        /// Returns the name of the data source at the specified index.
+        /// </summary>
+        /// <param name="index">Index.</param>
+        /// <returns>The name of the data source.</returns>
+        public string GetSourceProductName(int index)
+        {
+            return _sources[index].ProductName;
+        }
+
+        /// <summary>
+        /// Returns the product family of the data source at the specified index.
+        /// </summary>
+        /// <param name="index">Index.</param>
+        /// <returns>The product family of the data source.</returns>
+        public string GetSourceProductFamily(int index)
+        {
+            return _sources[index].ProductFamily;
+        }
 
         /// <summary>
         /// Gets a description of the specified source.
-        /// <para xml:lang="ru">Возвращает описание указанного источника. Gets the source identity.</para>
+        /// <para> Gets the source identity.</para>
         /// </summary>
-        /// <param name="index">Index.<para xml:lang="ru">Индекс. The index.</para></param>
+        /// <param name="index"></param>The index.</param>
         /// <returns>Description of the data source.<para xml:lang="ru">Описание источника данных.</para></returns>
-        public Identity GetSourceIdentity(int index) => new Identity(_sources[index]);
+        public Identity GetSourceIdentity(int index)
+        {
+            return new Identity(_sources[index]);
+        }
 
         /// <summary>
         /// Returns true if the specified source supports TWAIN 2.0; otherwise false.
-        /// <para xml:lang="ru">Возвращает истину, если указанный источник поддерживает TWAIN 2.0; иначе лож.</para>
         /// </summary>
-        /// <param name="index">Index<para xml:lang="ru">Индекс.</para></param>
-        /// <returns>True if the specified source supports TWAIN 2.0; otherwise false.<para xml:lang="ru">Истина, если указанный источник поддерживает TWAIN 2.0; иначе лож.</para></returns>
-        public bool GetIsSourceTwain2Compatible(int index) => (_sources[index].SupportedGroups & TwDG.DS2) != 0;
+        /// <param name="index">Index</param>
+        /// <returns>True if the specified source supports TWAIN 2.0; otherwise false.</returns>
+        public bool GetIsSourceTwain2Compatible(int index)
+        {
+            return (_sources[index].SupportedGroups & TwDG.DS2) != 0;
+        }
 
         /// <summary>
         /// Sets the specified data source as the default data source.
-        /// <para xml:lang="ru">Устанавливает указанный источник данных в качестве источника данных по умолчанию.</para>
         /// </summary>
-        /// <param name="index">Index.<para xml:lang="ru">Индекс.</para></param>
+        /// <param name="index">Index.</param>
         public void SetDefaultSource(int index)
         {
             if ((_TwainState & TwainStateFlag.DSMOpen) != 0)
@@ -641,13 +657,42 @@ namespace Saraff.Twain
         }
 
         /// <summary>
+        /// Sets the specified data source as the data source.
+        /// </summary>
+        /// <param name="index">Index.</param>
+        public void SetSource(string source)
+        {
+            if ((_TwainState & TwainStateFlag.DSMOpen) != 0)
+            {
+                if ((_TwainState & TwainStateFlag.DSOpen) == 0)
+                {
+                    List<TwIdentity> identities = new List<TwIdentity>();
+                    foreach (var identity in _sources)
+                    {
+                        identities.Add(identity);
+                    }
+
+                    var src = identities.Find(x => x.ProductName == source);
+                    _srcds = src;
+                    var cc = _dsmEntry.DsmInvoke(_AppId, TwDG.Control, TwDAT.Identity, TwMSG.Set, ref _srcds);
+
+                }
+                else
+                {
+                    throw new TwainException("The data source is already open. You must first close the data source. Источник данных уже открыт. Необходимо сперва закрыть источник данных.");
+                }
+            }
+            else
+            {
+                throw new TwainException("DSM is not open. DSM не открыт.");
+            }
+        }
+
+        /// <summary>
         /// Gets the default Data Source.
         /// </summary>
         /// <returns>Index of default Data Source.</returns>
         /// <exception cref="TwainException">
-        /// Не удалось найти источник данных по умолчанию.
-        /// or
-        /// DSM не открыт.
         /// </exception>
         public int GetDefaultSource()
         {
@@ -665,11 +710,11 @@ namespace Saraff.Twain
                         return i;
                     }
                 }
-                throw new TwainException("Could not find default data source. Не удалось найти источник данных по умолчанию.");
+                throw new TwainException("Could not find default data source.");
             }
             else
             {
-                throw new TwainException("DSM is not open. DSM не открыт.");
+                throw new TwainException("DSM is not open.");
             }
         }
 
@@ -679,7 +724,6 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Gets the application identifier.
-        /// <para xml:lang="ru">Возвращает идентификатор приложения.</para>
         /// </summary>
         [Browsable(false)]
         [ReadOnly(true)]
@@ -700,8 +744,8 @@ namespace Saraff.Twain
                         {
                             MajorNum = (ushort)_version.Major,
                             MinorNum = (ushort)_version.Minor,
-                            Language = TwLanguage.RUSSIAN,
-                            Country = TwCountry.BELARUS,
+                            Language = TwLanguage.ENGLISH,
+                            Country = TwCountry.SOUTHAFRICA,
                             Info = _asm_name.Version.ToString()
                         },
                         ProtocolMajor = (ushort)(_isTwain2Enable ? 2 : 1),
@@ -726,7 +770,6 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Gets or sets the name of the application.
-        /// <para xml:lang="ru">Возвращает или устанавливает имя приложения.</para>
         /// </summary>
         [Category("Behavior")]
         [Description("Gets or sets the name of the application. Возвращает или устанавливает имя приложения.")]
@@ -738,20 +781,26 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Gets or sets a value indicating whether to display the UI of the TWAIN source.
-        /// <para xml:lang="ru">Возвращает или устанавливает значение указывающие на необходимость отображения UI TWAIN-источника.</para>
         /// </summary>
         [Category("Behavior")]
         [DefaultValue(true)]
         [Description("Gets or sets a value indicating whether to display the UI of the TWAIN source. Возвращает или устанавливает значение указывающие на необходимость отображения UI TWAIN-источника.")]
-        public bool ShowUI { get; set; }
+        public bool ShowUI
+        {
+            get;
+            set;
+        }
 
         [Category("Behavior")]
         [DefaultValue(false)]
-        private bool ModalUI { get; set; }
+        private bool ModalUI
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the parent window for the TWAIN source.
-        /// <para xml:lang="ru">Возвращает или устанавливает родительское окно для TWAIN-источника.</para>
         /// </summary>
         /// <value>
         /// Окно.
@@ -759,11 +808,14 @@ namespace Saraff.Twain
         [Category("Behavior")]
         [DefaultValue(false)]
         [Description("Gets or sets the parent window for the TWAIN source. Возвращает или устанавливает родительское окно для TWAIN-источника.")]
-        public IWin32Window Parent { get; set; }
+        public IWin32Window Parent
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Get or set the primary language for your application.
-        /// <para xml:lang="ru">Возвращает или устанавливает используемый приложением язык.</para>
         /// </summary>
         [Category("Culture")]
         [DefaultValue(TwLanguage.RUSSIAN)]
@@ -776,7 +828,6 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Get or set the primary country where your application is intended to be distributed.
-        /// <para xml:lang="ru">Возвращает или устанавливает страну происхождения приложения.</para>
         /// </summary>
         [Category("Culture")]
         [DefaultValue(TwCountry.BELARUS)]
@@ -789,7 +840,6 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Gets or sets the frame of the physical location of the image.
-        /// <para xml:lang="ru">Возвращает или устанавливает кадр физического расположения изображения.</para>
         /// </summary>
         [Browsable(false)]
         [ReadOnly(true)]
@@ -818,7 +868,6 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Returns a set of capabilities (Capabilities).
-        /// <para xml:lang="ru">Возвращает набор возможностей (Capabilities).</para>
         /// </summary>
         [Browsable(false)]
         [ReadOnly(true)]
@@ -836,11 +885,91 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Returns a set of operations for working with a color palette.
-        /// <para xml:lang="ru">Возвращает набор операций для работы с цветовой палитрой.</para>
         /// </summary>
         [Browsable(false)]
         [ReadOnly(true)]
-        public TwainPalette Palette { get; private set; }
+        public TwainPalette Palette
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the permissions supported by the data source.
+        /// </summary>
+        /// <returns>Collection of values.</returns>
+        /// <exception cref="TwainException"></exception>
+        [Obsolete("Use Twain32.Capabilities.XResolution.Get() instead.", true)]
+        public Enumeration GetResolutions()
+        {
+            return Enumeration.FromObject(GetCap(TwCap.XResolution));
+        }
+
+        /// <summary>
+        /// Sets the current resolution.
+        /// </summary>
+        /// <param name="value">Resolution.</param>
+        /// <exception cref="TwainException"></exception>
+        [Obsolete("Use Twain32.Capabilities.XResolution.Set(value) and Twain32.Capabilities.YResolution.Set(value) instead.", true)]
+        public void SetResolutions(float value)
+        {
+            SetCap(TwCap.XResolution, value);
+            SetCap(TwCap.YResolution, value);
+        }
+
+        /// <summary>
+        /// Returns the pixel types supported by the data source.
+        /// </summary>
+        /// <returns>Collection of values.</returns>
+        /// <exception cref="TwainException"></exception>
+        [Obsolete("Use Twain32.Capabilities.PixelType.Get() instead.", true)]
+        public Enumeration GetPixelTypes()
+        {
+            Enumeration _val = Enumeration.FromObject(GetCap(TwCap.IPixelType));
+            for (int i = 0; i < _val.Count; i++)
+            {
+                _val[i] = (TwPixelType)_val[i];
+            }
+            return _val;
+        }
+
+        /// <summary>
+        /// Sets the current type of pixels.
+        /// </summary>
+        /// <param name="value">Type of pixels.</param>
+        /// <exception cref="TwainException"></exception>
+        [Obsolete("Use Twain32.Capabilities.PixelType.Set(value) instead.", true)]
+        public void SetPixelType(TwPixelType value)
+        {
+            SetCap(TwCap.IPixelType, value);
+        }
+
+        /// <summary>
+        /// Returns the units used by the data source.
+        /// </summary>
+        /// <returns>Units.</returns>
+        /// <exception cref="TwainException"></exception>
+        [Obsolete("Use Twain32.Capabilities.Units.Get() instead.", true)]
+        public Enumeration GetUnitOfMeasure()
+        {
+            Enumeration _val = Enumeration.FromObject(GetCap(TwCap.IUnits));
+            for (int i = 0; i < _val.Count; i++)
+            {
+                _val[i] = (TwUnits)_val[i];
+            }
+            return _val;
+        }
+
+        /// <summary>
+        /// Sets the current unit of measure used by the data source.
+        /// </summary>
+        /// <param name="value">Unit of measurement.</param>
+        /// <exception cref="TwainException">.</exception>
+        [Obsolete("Use Twain32.Capabilities.Units.Set(value) instead.", true)]
+        public void SetUnitOfMeasure(TwUnits value)
+        {
+            SetCap(TwCap.IUnits, value);
+        }
 
         #endregion
 
@@ -848,11 +977,10 @@ namespace Saraff.Twain
 
         /// <summary>
         /// Returns flags indicating operations supported by the data source for the specified capability value.
-        /// <para xml:lang="ru">Возвращает флаги, указывающие на поддерживаемые источником данных операции, для указанного значения capability.</para>
         /// </summary>
-        /// <param name="capability">The value of the TwCap enumeration.<para xml:lang="ru">Значение перечисдения TwCap.</para></param>
-        /// <returns>Set of flags.<para xml:lang="ru">Набор флагов.</para></returns>
-        /// <exception cref="TwainException">Возбуждается в случае возникновения ошибки во время операции.</exception>
+        /// <param name="capability">The value of the TwCap enumeration.</param>
+        /// <returns>Set of flags.</returns>
+        /// <exception cref="TwainException"></exception>
         public TwQC IsCapSupported(TwCap capability)
         {
             if ((_TwainState & TwainStateFlag.DSOpen) != 0)
@@ -874,18 +1002,17 @@ namespace Saraff.Twain
             }
             else
             {
-                throw new TwainException("The data source is not open. Источник данных не открыт.");
+                throw new TwainException("The data source is not open.");
             }
         }
 
         /// <summary>
         /// Returns the value for the specified capability.
-        /// <para xml:lang="ru">Возвращает значение для указанного capability (возможность).</para>
         /// </summary>
-        /// <param name="capability">The value of the TwCap enumeration.<para xml:lang="ru">Значение перечисления TwCap.</para></param>
-        /// <param name="msg">The value of the TwMSG enumeration.<para xml:lang="ru">Значение перечисления TwMSG.</para></param>
+        /// <param name="capability">The value of the TwCap enumeration.</param>
+        /// <param name="msg">The value of the TwMSG enumeration.</param>
         /// <returns>Depending on the value of capability, the following can be returned: type-value, array, <see cref="Twain32.Range">range</see>, <see cref="Twain32.Enumeration">transfer</see>.<para xml:lang="ru">В зависимости от значение capability, могут быть возвращены: тип-значение, массив, <see cref="Twain32.Range">диапазон</see>, <see cref="Twain32.Enumeration">перечисление</see>.</para></returns>
-        /// <exception cref="TwainException">Возбуждается в случае возникновения ошибки во время операции.</exception>
+        /// <exception cref="TwainException"></exception>
         private object _GetCapCore(TwCap capability, TwMSG msg)
         {
             if ((_TwainState & TwainStateFlag.DSOpen) != 0)
@@ -942,7 +1069,10 @@ namespace Saraff.Twain
         /// <param name="capability">The value of the TwCap enumeration.<para xml:lang="ru">Значение перечисления TwCap.</para></param>
         /// <returns>Depending on the value of capability, the following can be returned: type-value, array, <see cref="Twain32.Range">range</see>, <see cref="Twain32.Enumeration">transfer</see>.<para xml:lang="ru">В зависимости от значение capability, могут быть возвращены: тип-значение, массив, <see cref="Twain32.Range">диапазон</see>, <see cref="Twain32.Enumeration">перечисление</see>.</para></returns>
         /// <exception cref="TwainException">Возбуждается в случае возникновения ошибки во время операции.</exception>
-        public object GetCap(TwCap capability) => _GetCapCore(capability, TwMSG.Get);
+        public object GetCap(TwCap capability)
+        {
+            return _GetCapCore(capability, TwMSG.Get);
+        }
 
         /// <summary>
         /// Returns the current value for the specified feature. (capability).
@@ -951,7 +1081,10 @@ namespace Saraff.Twain
         /// <param name="capability">The value of the TwCap enumeration.<para xml:lang="ru">Значение перечисления TwCap.</para></param>
         /// <returns>Depending on the value of capability, the following can be returned: type-value, array, <see cref="Twain32.Range">range</see>, <see cref="Twain32.Enumeration">transfer</see>.<para xml:lang="ru">В зависимости от значение capability, могут быть возвращены: тип-значение, массив, <see cref="Twain32.Range">диапазон</see>, <see cref="Twain32.Enumeration">перечисление</see>.</para></returns>
         /// <exception cref="TwainException">Возбуждается в случае возникновения ошибки во время операции.</exception>
-        public object GetCurrentCap(TwCap capability) => _GetCapCore(capability, TwMSG.GetCurrent);
+        public object GetCurrentCap(TwCap capability)
+        {
+            return _GetCapCore(capability, TwMSG.GetCurrent);
+        }
 
         /// <summary>
         /// Returns the default value for the specified feature. (capability).
@@ -960,7 +1093,10 @@ namespace Saraff.Twain
         /// <param name="capability">The value of the TwCap enumeration.<para xml:lang="ru">Значение перечисления TwCap.</para></param>
         /// <returns>Depending on the value of capability, the following can be returned: type-value, array, <see cref="Twain32.Range">range</see>, <see cref="Twain32.Enumeration">transfer</see>.<para xml:lang="ru">В зависимости от значение capability, могут быть возвращены: тип-значение, массив, <see cref="Twain32.Range">диапазон</see>, <see cref="Twain32.Enumeration">перечисление</see>.</para></returns>
         /// <exception cref="TwainException">Возбуждается в случае возникновения ошибки во время операции.</exception>
-        public object GetDefaultCap(TwCap capability) => _GetCapCore(capability, TwMSG.GetDefault);
+        public object GetDefaultCap(TwCap capability)
+        {
+            return _GetCapCore(capability, TwMSG.GetDefault);
+        }
 
         /// <summary>
         /// Resets the current value for the specified <see cref="TwCap">capability</see> to default value.
@@ -1082,7 +1218,10 @@ namespace Saraff.Twain
                 msg);
         }
 
-        private void _SetCapCore(TwCap capability, TwMSG msg, Range value) => _SetCapCore(new TwCapability(capability, value.ToTwRange()), msg);
+        private void _SetCapCore(TwCap capability, TwMSG msg, Range value)
+        {
+            _SetCapCore(new TwCapability(capability, value.ToTwRange()), msg);
+        }
 
         private void _SetCapCore(TwCap capability, TwMSG msg, Enumeration value)
         {
@@ -1108,7 +1247,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetCap(TwCap capability, object value) => _SetCapCore(capability, TwMSG.Set, value);
+        public void SetCap(TwCap capability, object value)
+        {
+            _SetCapCore(capability, TwMSG.Set, value);
+        }
 
         /// <summary>
         /// Sets the value for the specified <see cref="TwCap">capability</see>
@@ -1117,7 +1259,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetCap(TwCap capability, object[] value) => _SetCapCore(capability, TwMSG.Set, value);
+        public void SetCap(TwCap capability, object[] value)
+        {
+            _SetCapCore(capability, TwMSG.Set, value);
+        }
 
         /// <summary>
         /// Sets the value for the specified <see cref="TwCap">capability</see>
@@ -1126,7 +1271,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetCap(TwCap capability, Range value) => _SetCapCore(capability, TwMSG.Set, value);
+        public void SetCap(TwCap capability, Range value)
+        {
+            _SetCapCore(capability, TwMSG.Set, value);
+        }
 
         /// <summary>
         /// Sets the value for the specified <see cref="TwCap">capability</see>
@@ -1135,7 +1283,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetCap(TwCap capability, Enumeration value) => _SetCapCore(capability, TwMSG.Set, value);
+        public void SetCap(TwCap capability, Enumeration value)
+        {
+            _SetCapCore(capability, TwMSG.Set, value);
+        }
 
         /// <summary>
         /// Sets a limit on the values of the specified feature.
@@ -1144,7 +1295,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetConstraintCap(TwCap capability, object value) => _SetCapCore(capability, TwMSG.SetConstraint, value);
+        public void SetConstraintCap(TwCap capability, object value)
+        {
+            _SetCapCore(capability, TwMSG.SetConstraint, value);
+        }
 
         /// <summary>
         /// Sets a limit on the values of the specified feature.
@@ -1153,7 +1307,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetConstraintCap(TwCap capability, object[] value) => _SetCapCore(capability, TwMSG.SetConstraint, value);
+        public void SetConstraintCap(TwCap capability, object[] value)
+        {
+            _SetCapCore(capability, TwMSG.SetConstraint, value);
+        }
 
         /// <summary>
         /// Sets a limit on the values of the specified feature.
@@ -1162,7 +1319,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetConstraintCap(TwCap capability, Range value) => _SetCapCore(capability, TwMSG.SetConstraint, value);
+        public void SetConstraintCap(TwCap capability, Range value)
+        {
+            _SetCapCore(capability, TwMSG.SetConstraint, value);
+        }
 
         /// <summary>
         /// Sets a limit on the values of the specified feature.
@@ -1171,7 +1331,10 @@ namespace Saraff.Twain
         /// <param name="capability">Listing Value <see cref="TwCap"/>.<para xml:lang="ru">Значение перечисления <see cref="TwCap"/>.</para></param>
         /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
         /// <exception cref="TwainException">Возникает в случае, если источник данных не открыт.</exception>
-        public void SetConstraintCap(TwCap capability, Enumeration value) => _SetCapCore(capability, TwMSG.SetConstraint, value);
+        public void SetConstraintCap(TwCap capability, Enumeration value)
+        {
+            _SetCapCore(capability, TwMSG.SetConstraint, value);
+        }
 
         #endregion
 
@@ -1232,7 +1395,7 @@ namespace Saraff.Twain
                         }
                         _img = _handler.PtrToStream(_pBitmap, GetService(typeof(IStreamProvider)) as IStreamProvider);
 
-                        _images.Add(_img);
+                        //this._images.Add(_img);
                         if (_OnEndXfer(new EndXferEventArgs(_img)))
                         {
                             return;
@@ -1252,6 +1415,7 @@ namespace Saraff.Twain
             finally
             {
                 TwRC _rc = _dsmEntry.DsInvoke(_AppId, _srcds, TwDG.Control, TwDAT.PendingXfers, TwMSG.Reset, ref _pxfr);
+
             }
         }
 
@@ -1429,62 +1593,6 @@ namespace Saraff.Twain
 
         #endregion
 
-        #region DG_CONTROL / DAT_CUSTOMDSDATA / MSG_xxx
-
-        /// <summary>
-        /// Get or set the Custom Data (DG_CONTROL / DAT_CUSTOMDSDATA / MSG_xxx).
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public byte[] CustomDSData
-        {
-            get
-            {
-                if ((_TwainState & TwainStateFlag.DSOpen) != 0)
-                {
-                    TwCustomDSData _data = new TwCustomDSData { };
-                    TwRC _rc = _dsmEntry.DsInvoke(_AppId, _srcds, TwDG.Control, TwDAT.CustomDSData, TwMSG.Get, ref _data);
-                    if (_rc != TwRC.Success)
-                    {
-                        throw new TwainException(_GetTwainStatus(), _rc);
-                    }
-                    byte[] _value = new byte[_data.InfoLength];
-                    Marshal.Copy(_Memory.Lock(_data.hData), _value, 0, _value.Length);
-                    _Memory.Unlock(_data.hData);
-                    _Memory.Free(_data.hData);
-                    return _value;
-                }
-                else
-                {
-                    throw new TwainException("Источник данных не открыт.");
-                }
-            }
-            set
-            {
-                if ((_TwainState & TwainStateFlag.DSOpen) != 0)
-                {
-                    TwCustomDSData _data = new TwCustomDSData
-                    {
-                        InfoLength = (uint)value.Length,
-                        hData = _Memory.Alloc(value.Length)
-                    };
-                    Marshal.Copy(value, 0, _Memory.Lock(_data.hData), value.Length);
-                    _Memory.Unlock(_data.hData);
-                    TwRC _rc = _dsmEntry.DsInvoke(_AppId, _srcds, TwDG.Control, TwDAT.CustomDSData, TwMSG.Set, ref _data);
-                    if (_rc != TwRC.Success)
-                    {
-                        throw new TwainException(_GetTwainStatus(), _rc);
-                    }
-                    _Memory.Free(_data.hData);
-                }
-                else
-                {
-                    throw new TwainException("Источник данных не открыт.");
-                }
-            }
-        }
-
-        #endregion
-
         #region DS events handler
 
         /// <summary>
@@ -1580,7 +1688,7 @@ namespace Saraff.Twain
                 }
                 _OnAcquireError(new AcquireErrorEventArgs(ex));
             }
-            catch
+            catch (Exception ex)
             {
                 try
                 {
@@ -1606,47 +1714,83 @@ namespace Saraff.Twain
 
         #region Raise events
 
-        private void _OnAcquireCompleted(EventArgs e) => AcquireCompleted?.Invoke(this, e);
+        private void _OnAcquireCompleted(EventArgs e)
+        {
+            if (AcquireCompleted != null)
+            {
+                AcquireCompleted(this, e);
+            }
+        }
 
-        private void _OnAcquireError(AcquireErrorEventArgs e) => AcquireError?.Invoke(this, e);
+        private void _OnAcquireError(AcquireErrorEventArgs e)
+        {
+            if (AcquireError != null)
+            {
+                AcquireError(this, e);
+            }
+        }
 
         private bool _OnXferDone(XferDoneEventArgs e)
         {
-            XferDone?.Invoke(this, e);
+            if (XferDone != null)
+            {
+                XferDone(this, e);
+            }
             return e.Cancel;
         }
 
         private bool _OnEndXfer(EndXferEventArgs e)
         {
-            EndXfer?.Invoke(this, e);
+            if (EndXfer != null)
+            {
+                EndXfer(this, e);
+            }
             return e.Cancel;
         }
 
         private bool _OnSetupMemXfer(SetupMemXferEventArgs e)
         {
-            SetupMemXferEvent?.Invoke(this, e);
+            if (SetupMemXferEvent != null)
+            {
+                SetupMemXferEvent(this, e);
+            }
             return e.Cancel;
         }
 
         private bool _OnMemXfer(MemXferEventArgs e)
         {
-            MemXferEvent?.Invoke(this, e);
+            if (MemXferEvent != null)
+            {
+                MemXferEvent(this, e);
+            }
             return e.Cancel;
         }
 
         private bool _OnSetupFileXfer(SetupFileXferEventArgs e)
         {
-            SetupFileXferEvent?.Invoke(this, e);
+            if (SetupFileXferEvent != null)
+            {
+                SetupFileXferEvent(this, e);
+            }
             return e.Cancel;
         }
 
         private bool _OnFileXfer(FileXferEventArgs e)
         {
-            FileXferEvent?.Invoke(this, e);
+            if (FileXferEvent != null)
+            {
+                FileXferEvent(this, e);
+            }
             return e.Cancel;
         }
 
-        private void _OnDeviceEvent(DeviceEventEventArgs e) => DeviceEvent?.Invoke(this, e);
+        private void _OnDeviceEvent(DeviceEventEventArgs e)
+        {
+            if (DeviceEvent != null)
+            {
+                DeviceEvent(this, e);
+            }
+        }
 
         #endregion
 
@@ -1895,7 +2039,7 @@ namespace Saraff.Twain
         [Serializable]
         public sealed class EndXferEventArgs : SerializableCancelEventArgs
         {
-            private readonly _Image _image;
+            private _Image _image;
 
             /// <summary>
             /// Initializes a new instance of the class.
@@ -1907,7 +2051,10 @@ namespace Saraff.Twain
                 _image = image as _Image;
             }
 
-            public T CreateImage<T>(IImageFactory<T> factory) where T : class => factory.Create(_image);
+            public T CreateImage<T>(IImageFactory<T> factory) where T : class
+            {
+                return factory.Create(_image);
+            }
 
             /// <summary>
             /// Returns the image.
@@ -1930,8 +2077,8 @@ namespace Saraff.Twain
         /// </summary>
         public sealed class XferDoneEventArgs : SerializableCancelEventArgs
         {
-            private readonly GetImageInfoCallback _imageInfoMethod;
-            private readonly GetExtImageInfoCallback _extImageInfoMethod;
+            private GetImageInfoCallback _imageInfoMethod;
+            private GetExtImageInfoCallback _extImageInfoMethod;
 
             /// <summary>
             /// Initializes a new instance of the class <see cref="XferDoneEventArgs"/>.
@@ -1950,7 +2097,10 @@ namespace Saraff.Twain
             /// <para xml:lang="ru">Возвращает описание полученного изображения.</para>
             /// </summary>
             /// <returns>Description of the image.<para xml:lang="ru">Описание изображения.</para></returns>
-            public ImageInfo GetImageInfo() => _imageInfoMethod();
+            public ImageInfo GetImageInfo()
+            {
+                return _imageInfoMethod();
+            }
 
             /// <summary>
             /// Returns an extended description of the resulting image.
@@ -1958,7 +2108,10 @@ namespace Saraff.Twain
             /// </summary>
             /// <param name="extInfo">A set of codes for the extended image description for which you want to get a description.<para xml:lang="ru">Набор кодов расширенного описания изображения для которых требуется получить описание.</para></param>
             /// <returns>Extended image description.<para xml:lang="ru">Расширенное описание изображения.</para></returns>
-            public ExtImageInfo GetExtImageInfo(params TwEI[] extInfo) => _extImageInfoMethod(extInfo);
+            public ExtImageInfo GetExtImageInfo(params TwEI[] extInfo)
+            {
+                return _extImageInfoMethod(extInfo);
+            }
         }
 
         /// <summary>
@@ -1985,13 +2138,21 @@ namespace Saraff.Twain
             /// Returns a description of the image.
             /// <para xml:lang="ru">Возвращает описание изображения.</para>
             /// </summary>
-            public ImageInfo ImageInfo { get; private set; }
+            public ImageInfo ImageInfo
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Gets the size of the memory buffer for data transfer.
             /// <para xml:lang="ru">Возвращает размер буфера памяти для передачи данных.</para>
             /// </summary>
-            public uint BufferSize { get; private set; }
+            public uint BufferSize
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -2018,13 +2179,21 @@ namespace Saraff.Twain
             /// Returns a description of the image.
             /// <para xml:lang="ru">Возвращает описание изображения.</para>
             /// </summary>
-            public ImageInfo ImageInfo { get; private set; }
+            public ImageInfo ImageInfo
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Returns a piece of image data.
             /// <para xml:lang="ru">Возвращает фрагмент данных изображения.</para>
             /// </summary>
-            public ImageMemXfer ImageMemXfer { get; private set; }
+            public ImageMemXfer ImageMemXfer
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -2047,7 +2216,11 @@ namespace Saraff.Twain
             /// Gets or sets the name of the image file.
             /// <para xml:lang="ru">Возвращает или устанавливает имя файла изображения.</para>
             /// </summary>
-            public string FileName { get; set; }
+            public string FileName
+            {
+                get;
+                set;
+            }
         }
 
         /// <summary>
@@ -2072,7 +2245,11 @@ namespace Saraff.Twain
             /// Returns a description of the image file.
             /// <para xml:lang="ru">Возвращает описание файла изображения.</para>
             /// </summary>
-            public ImageFileXfer ImageFileXfer { get; private set; }
+            public ImageFileXfer ImageFileXfer
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -2097,7 +2274,11 @@ namespace Saraff.Twain
             /// Returns the status flags of a twain device.
             /// <para xml:lang="ru">Возвращает флаги состояния twain-устройства.</para>
             /// </summary>
-            public TwainStateFlag TwainState { get; private set; }
+            public TwainStateFlag TwainState
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -2106,7 +2287,7 @@ namespace Saraff.Twain
         /// </summary>
         public sealed class DeviceEventEventArgs : EventArgs
         {
-            private readonly TwDeviceEvent _deviceEvent;
+            private TwDeviceEvent _deviceEvent;
 
             internal DeviceEventEventArgs(TwDeviceEvent deviceEvent)
             {
@@ -2191,7 +2372,11 @@ namespace Saraff.Twain
             /// Gets an instance of the exception class.
             /// <para xml:lang="ru">Возвращает экземпляр класса исключения.</para>
             /// </summary>
-            public TwainException Exception { get; private set; }
+            public TwainException Exception
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -2209,7 +2394,11 @@ namespace Saraff.Twain
             /// <value>
             /// Значение <c>true</c>, если событие следует отменить, в противном случае — значение <c>false</c>.
             /// </value>
-            public bool Cancel { get; set; }
+            public bool Cancel
+            {
+                get;
+                set;
+            }
         }
 
         #endregion
@@ -2222,7 +2411,6 @@ namespace Saraff.Twain
         /// </summary>
         private sealed class _DsmEntry
         {
-
             /// <summary>
             /// Initializes a new instance of the class <see cref="_DsmEntry"/>.
             /// <para xml:lang="ru">Инициализирует новый экземпляр класса <see cref="_DsmEntry"/>.</para>
@@ -2259,8 +2447,12 @@ namespace Saraff.Twain
             /// <para xml:lang="ru">Создает и возвращает новый экземпляр класса <see cref="_DsmEntry"/>.</para>
             /// </summary>
             /// <param name="ptr">Pointer to DSM_Entry.<para xml:lang="ru">Указатель на DSM_Entry.</para></param>
+            /// <param name="eventAggregator"></param>
             /// <returns>Class instance <see cref="_DsmEntry"/>.<para xml:lang="ru">Экземпляр класса <see cref="_DsmEntry"/>.</para></returns>
-            public static _DsmEntry Create(IntPtr ptr) => new _DsmEntry(ptr);
+            public static _DsmEntry Create(IntPtr ptr)
+            {
+                return new _DsmEntry(ptr);
+            }
 
             /// <summary>
             /// Casts a pointer to the requested delegate.
@@ -2269,7 +2461,10 @@ namespace Saraff.Twain
             /// <typeparam name="T">Требуемый делегат.</typeparam>
             /// <param name="ptr">Pointer to DSM_Entry.<para xml:lang="ru">Указатель на DSM_Entry.</para></param>
             /// <returns>Delegate.<para xml:lang="ru">Делегат.</para></returns>
-            private static T CreateDelegate<T>(IntPtr ptr) where T : class => Marshal.GetDelegateForFunctionPointer(ptr, typeof(T)) as T;
+            private static T CreateDelegate<T>(IntPtr ptr) where T : class
+            {
+                return Marshal.GetDelegateForFunctionPointer(ptr, typeof(T)) as T;
+            }
 
             public TwRC DsmInvoke<T>(TwIdentity origin, TwDG dg, TwDAT dat, TwMSG msg, ref T data) where T : class
             {
@@ -2287,6 +2482,7 @@ namespace Saraff.Twain
                     {
                         data = (T)Marshal.PtrToStructure(_data, typeof(T));
                     }
+
                     return _rc;
                 }
                 finally
@@ -2301,17 +2497,21 @@ namespace Saraff.Twain
                 {
                     throw new ArgumentNullException();
                 }
+
                 IntPtr _data = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(T)));
                 try
                 {
                     Marshal.StructureToPtr(data, _data, true);
-
                     TwRC _rc = DsRaw(origin, dest, dg, dat, msg, _data);
                     if (_rc == TwRC.Success || _rc == TwRC.DSEvent || _rc == TwRC.XferDone)
                     {
                         data = (T)Marshal.PtrToStructure(_data, typeof(T));
                     }
                     return _rc;
+                }
+                catch (Exception ex)
+                {
+                    return TwRC.Failure;
                 }
                 finally
                 {
@@ -2321,13 +2521,29 @@ namespace Saraff.Twain
 
             #region Properties
 
-            public _DSMparent DsmParent { get; private set; }
+            public _DSMparent DsmParent
+            {
+                get;
+                private set;
+            }
 
-            public _DSMraw DsmRaw { get; private set; }
+            public _DSMraw DsmRaw
+            {
+                get;
+                private set;
+            }
 
-            public _DSixfer DSImageXfer { get; private set; }
+            public _DSixfer DSImageXfer
+            {
+                get;
+                private set;
+            }
 
-            public _DSraw DsRaw { get; private set; }
+            public _DSraw DsRaw
+            {
+                get;
+                private set;
+            }
 
             #endregion
 
@@ -2483,7 +2699,10 @@ namespace Saraff.Twain
             /// <para xml:lang="ru">Устаначливает точки входа.</para>
             /// </summary>
             /// <param name="entry">Entry points.<para xml:lang="ru">Точки входа.</para></param>
-            internal static void _SetEntryPoints(TwEntryPoint entry) => _entryPoint = entry;
+            internal static void _SetEntryPoints(TwEntryPoint entry)
+            {
+                _entryPoint = entry;
+            }
 
             #region import kernel32.dll
 
@@ -2606,8 +2825,8 @@ namespace Saraff.Twain
                     }
                     Marshal.StructureToPtr(new WINMSG { hwnd = m.HWnd, message = m.Msg, wParam = m.WParam, lParam = m.LParam }, _evtmsg.EventPtr, true);
                     _evtmsg.Message = TwMSG.Null;
-
-                    switch (_twain._dsmEntry.DsInvoke(_twain._AppId, _twain._srcds, TwDG.Control, TwDAT.Event, TwMSG.ProcessEvent, ref _evtmsg))
+                    switch (_twain._dsmEntry.DsInvoke(_twain._AppId, _twain._srcds, TwDG.Control,
+                            TwDAT.Event, TwMSG.ProcessEvent, ref _evtmsg))
                     {
                         case TwRC.DSEvent:
                             _twain._TwCallbackProcCore(_evtmsg.Message, isCloseReq =>
@@ -2618,14 +2837,19 @@ namespace Saraff.Twain
                                     _twain._DisableDataSource();
                                 }
                             });
+
                             break;
                         case TwRC.NotDSEvent:
                             return false;
+                            break;
                         case TwRC.Failure:
                             throw new TwainException(_twain._GetTwainStatus(), TwRC.Failure);
                         default:
-                            throw new InvalidOperationException("Получен неверный код результата операции. Invalid a Return Code value.");
+                            throw new InvalidOperationException(
+                                "Получен неверный код результата операции. Invalid a Return Code value.");
                     }
+
+
                 }
                 catch (TwainException ex)
                 {
@@ -2687,14 +2911,17 @@ namespace Saraff.Twain
             private Image _image = null;
 #if !NET2
             [NonSerialized]
-            private System.Windows.Media.Imaging.BitmapImage _image2 = null;
+            private BitmapImage _image2 = null;
 #endif
 
             private _Image()
             {
             }
 
-            public static implicit operator _Image(Stream stream) => new _Image { _stream = stream };
+            public static implicit operator _Image(Stream stream)
+            {
+                return new _Image { _stream = stream };
+            }
 
             public static implicit operator Stream(_Image image)
             {
@@ -2718,10 +2945,10 @@ namespace Saraff.Twain
                 if (value._image2 == null)
                 {
                     value._stream.Seek(0L, SeekOrigin.Begin);
-                    value._image2 = new System.Windows.Media.Imaging.BitmapImage();
+                    value._image2 = new BitmapImage();
                     value._image2.BeginInit();
                     value._image2.StreamSource = value._stream;
-                    value._image2.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                    value._image2.CacheOption = BitmapCacheOption.OnLoad;
                     value._image2.EndInit();
                     value._image2.Freeze();
                 }
@@ -2764,7 +2991,10 @@ namespace Saraff.Twain
             /// </summary>
             /// <param name="range">Instance <see cref="TwRange"/>.<para xml:lang="ru">Экземпляр <see cref="TwRange"/>.</para></param>
             /// <returns>Instance <see cref="Range"/>.<para xml:lang="ru">Экземпляр <see cref="Range"/>.</para></returns>
-            internal static Range CreateRange(TwRange range) => new Range(range);
+            internal static Range CreateRange(TwRange range)
+            {
+                return new Range(range);
+            }
 
             /// <summary>
             /// Creates and returns an instance <see cref="Range"/>.
@@ -2776,44 +3006,67 @@ namespace Saraff.Twain
             /// <param name="defaultValue">The default value.<para xml:lang="ru">Значение по умолчанию.</para></param>
             /// <param name="currentValue">Present value.<para xml:lang="ru">Текущее значение.</para></param>
             /// <returns>Instance <see cref="Range"/>.<para xml:lang="ru">Экземпляр <see cref="Range"/>.</para></returns>
-            public static Range CreateRange(object minValue, object maxValue, object stepSize, object defaultValue, object currentValue) => new Range()
+            public static Range CreateRange(object minValue, object maxValue, object stepSize, object defaultValue, object currentValue)
             {
-                MinValue = minValue,
-                MaxValue = maxValue,
-                StepSize = stepSize,
-                DefaultValue = defaultValue,
-                CurrentValue = currentValue
-            };
+                return new Range()
+                {
+                    MinValue = minValue,
+                    MaxValue = maxValue,
+                    StepSize = stepSize,
+                    DefaultValue = defaultValue,
+                    CurrentValue = currentValue
+                };
+            }
 
             /// <summary>
             /// Gets or sets the minimum value.
             /// <para xml:lang="ru">Возвращает или устанавливает минимальное значение.</para>
             /// </summary>
-            public object MinValue { get; set; }
+            public object MinValue
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// Gets or sets the maximum value.
             /// <para xml:lang="ru">Возвращает или устанавливает максимальное значение.</para>
             /// </summary>
-            public object MaxValue { get; set; }
+            public object MaxValue
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// Gets or sets the step.
             /// <para xml:lang="ru">Возвращает или устанавливает шаг.</para>
             /// </summary>
-            public object StepSize { get; set; }
+            public object StepSize
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// Gets or sets the default value.
             /// <para xml:lang="ru">Возвращает или устанавливает значае по умолчанию.</para>
             /// </summary>
-            public object DefaultValue { get; set; }
+            public object DefaultValue
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// Gets or sets the current value.
             /// <para xml:lang="ru">Возвращает или устанавливает текущее значение.</para>
             /// </summary>
-            public object CurrentValue { get; set; }
+            public object CurrentValue
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// Converts an instance of a class to an instance <see cref="TwRange"/>.
@@ -2865,7 +3118,10 @@ namespace Saraff.Twain
             /// <param name="currentIndex">Current index.<para xml:lang="ru">Текущий индекс.</para></param>
             /// <param name="defaultIndex">The default index.<para xml:lang="ru">Индекс по умолчанию.</para></param>
             /// <returns>Instance <see cref="Enumeration"/>.<para xml:lang="ru">Экземпляр <see cref="Enumeration"/>.</para></returns>
-            public static Enumeration CreateEnumeration(object[] items, int currentIndex, int defaultIndex) => new Enumeration(items, currentIndex, defaultIndex);
+            public static Enumeration CreateEnumeration(object[] items, int currentIndex, int defaultIndex)
+            {
+                return new Enumeration(items, currentIndex, defaultIndex);
+            }
 
             /// <summary>
             /// Returns the number of items.
@@ -2877,13 +3133,21 @@ namespace Saraff.Twain
             /// Returns the current index.
             /// <para xml:lang="ru">Возвращает текущий индекс.</para>
             /// </summary>
-            public int CurrentIndex { get; private set; }
+            public int CurrentIndex
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Returns the default index.
             /// <para xml:lang="ru">Возвращает индекс по умолчанию.</para>
             /// </summary>
-            public int DefaultIndex { get; private set; }
+            public int DefaultIndex
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Returns the element at the specified index.
@@ -2930,7 +3194,10 @@ namespace Saraff.Twain
             /// </summary>
             /// <param name="value">An array of values.<para xml:lang="ru">Массив значений.</para></param>
             /// <returns>Instance <see cref="Enumeration"/>.<para xml:lang="ru">Экземпляр <see cref="Enumeration"/>.</para></returns>
-            public static Enumeration FromArray(object[] value) => CreateEnumeration(value, 0, 0);
+            public static Enumeration FromArray(object[] value)
+            {
+                return CreateEnumeration(value, 0, 0);
+            }
 
             /// <summary>
             /// Creates and returns an instance <see cref="Enumeration"/>.
@@ -2945,17 +3212,17 @@ namespace Saraff.Twain
 
             internal static Enumeration FromObject(object value)
             {
-                if (value is Range _v1)
+                if (value is Range)
                 {
-                    return FromRange(_v1);
+                    return FromRange((Range)value);
                 }
-                if (value is object[] _v2)
+                if (value is object[])
                 {
-                    return FromArray(_v2);
+                    return FromArray((object[])value);
                 }
-                if (value is ValueType _v3)
+                if (value is ValueType)
                 {
-                    return FromOneValue(_v3);
+                    return FromOneValue((ValueType)value);
                 }
                 if (value is string)
                 {
@@ -2983,18 +3250,22 @@ namespace Saraff.Twain
             /// </summary>
             /// <param name="info">Description of the image.<para xml:lang="ru">Описание изображения.</para></param>
             /// <returns>An instance of the ImageInfo class.<para xml:lang="ru">Экземпляр класса ImageInfo.</para></returns>
-            internal static ImageInfo FromTwImageInfo(TwImageInfo info) => new ImageInfo
+            internal static ImageInfo FromTwImageInfo(TwImageInfo info)
             {
-                BitsPerPixel = info.BitsPerPixel,
-                BitsPerSample = _Copy(info.BitsPerSample, info.SamplesPerPixel),
-                Compression = info.Compression,
-                ImageLength = info.ImageLength,
-                ImageWidth = info.ImageWidth,
-                PixelType = info.PixelType,
-                Planar = info.Planar,
-                XResolution = info.XResolution,
-                YResolution = info.YResolution
-            };
+
+                return new ImageInfo
+                {
+                    BitsPerPixel = info.BitsPerPixel,
+                    BitsPerSample = _Copy(info.BitsPerSample, info.SamplesPerPixel),
+                    Compression = info.Compression,
+                    ImageLength = info.ImageLength,
+                    ImageWidth = info.ImageWidth,
+                    PixelType = info.PixelType,
+                    Planar = info.Planar,
+                    XResolution = info.XResolution,
+                    YResolution = info.YResolution
+                };
+            }
 
             private static short[] _Copy(short[] array, int len)
             {
@@ -3009,47 +3280,83 @@ namespace Saraff.Twain
             /// <summary>
             /// Resolution in the horizontal
             /// </summary>
-            public float XResolution { get; private set; }
+            public float XResolution
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Resolution in the vertical
             /// </summary>
-            public float YResolution { get; private set; }
+            public float YResolution
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Columns in the image, -1 if unknown by DS
             /// </summary>
-            public int ImageWidth { get; private set; }
+            public int ImageWidth
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Rows in the image, -1 if unknown by DS
             /// </summary>
-            public int ImageLength { get; private set; }
+            public int ImageLength
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Number of bits for each sample
             /// </summary>
-            public short[] BitsPerSample { get; private set; }
+            public short[] BitsPerSample
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Number of bits for each padded pixel
             /// </summary>
-            public short BitsPerPixel { get; private set; }
+            public short BitsPerPixel
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// True if Planar, False if chunky
             /// </summary>
-            public bool Planar { get; private set; }
+            public bool Planar
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// How to interp data; photo interp
             /// </summary>
-            public TwPixelType PixelType { get; private set; }
+            public TwPixelType PixelType
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// How the data is compressed
             /// </summary>
-            public TwCompression Compression { get; private set; }
+            public TwCompression Compression
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -3127,44 +3434,67 @@ namespace Saraff.Twain
                 /// </summary>
                 /// <param name="info">An internal instance of the extended image information description element class.<para xml:lang="ru">Внутрений экземпляр класса элемента описания расширенной информации о изображении.</para></param>
                 /// <returns>An instance of the extended image information description item class.<para xml:lang="ru">Экземпляр класса элемента описания расширенной информации о изображении.</para></returns>
-                internal static InfoItem FromTwInfo(TwInfo info) => new InfoItem
+                internal static InfoItem FromTwInfo(TwInfo info)
                 {
-                    InfoId = info.InfoId,
-                    IsNotSupported = info.ReturnCode == TwRC.InfoNotSupported,
-                    IsNotAvailable = info.ReturnCode == TwRC.DataNotAvailable,
-                    IsSuccess = info.ReturnCode == TwRC.Success,
-                    Value = info.GetValue()
-                };
+                    return new InfoItem
+                    {
+                        InfoId = info.InfoId,
+                        IsNotSupported = info.ReturnCode == TwRC.InfoNotSupported,
+                        IsNotAvailable = info.ReturnCode == TwRC.DataNotAvailable,
+                        IsSuccess = info.ReturnCode == TwRC.Success,
+                        Value = info.GetValue()
+                    };
+                }
 
                 /// <summary>
                 /// Returns a code for extended image information.
                 /// <para xml:lang="ru">Возвращает код расширенной информации о изображении.</para>
                 /// </summary>
-                public TwEI InfoId { get; private set; }
+                public TwEI InfoId
+                {
+                    get;
+                    private set;
+                }
 
                 /// <summary>
                 /// Вreturns true if the requested information is not supported by the data source; otherwise false.
                 /// <para xml:lang="ru">Возвращает true, если запрошенная информация не поддерживается источником данных; иначе, false.</para>
                 /// </summary>
-                public bool IsNotSupported { get; private set; }
+                public bool IsNotSupported
+                {
+                    get;
+                    private set;
+                }
 
                 /// <summary>
                 /// Returns true if the requested information is supported by the data source but is currently unavailable; otherwise false.
                 /// <para xml:lang="ru">Возвращает true, если запрошенная информация поддерживается источником данных, но в данный момент недоступна; иначе, false.</para>
                 /// </summary>
-                public bool IsNotAvailable { get; private set; }
+                public bool IsNotAvailable
+                {
+                    get;
+                    private set;
+                }
 
                 /// <summary>
                 /// Returns true if the requested information was successfully retrieved; otherwise false.
                 /// <para xml:lang="ru">Возвращает true, если запрошенная информация была успешно извлечена; иначе, false.</para>
                 /// </summary>
-                public bool IsSuccess { get; private set; }
+                public bool IsSuccess
+                {
+                    get;
+                    private set;
+                }
 
                 /// <summary>
                 /// Returns the value of an element.
                 /// <para xml:lang="ru">Возвращает значение элемента.</para>
                 /// </summary>
-                public object Value { get; private set; }
+                public object Value
+                {
+                    get;
+                    private set;
+                }
             }
         }
 
@@ -3214,37 +3544,65 @@ namespace Saraff.Twain
             /// <summary>
             /// How the data is compressed.
             /// </summary>
-            public TwCompression Compression { get; private set; }
+            public TwCompression Compression
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Number of bytes in a row of data.
             /// </summary>
-            public uint BytesPerRow { get; private set; }
+            public uint BytesPerRow
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// How many columns.
             /// </summary>
-            public uint Columns { get; private set; }
+            public uint Columns
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// How many rows.
             /// </summary>
-            public uint Rows { get; private set; }
+            public uint Rows
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// How far from the side of the image.
             /// </summary>
-            public uint XOffset { get; private set; }
+            public uint XOffset
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// How far from the top of the image.
             /// </summary>
-            public uint YOffset { get; private set; }
+            public uint YOffset
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Data.
             /// </summary>
-            public byte[] ImageData { get; private set; }
+            public byte[] ImageData
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -3269,23 +3627,34 @@ namespace Saraff.Twain
             /// </summary>
             /// <param name="data">File description.<para xml:lang="ru">Описание файла.</para></param>
             /// <returns>Instance <see cref="ImageFileXfer"/>.<para xml:lang="ru">Экземпляр <see cref="ImageFileXfer"/>.</para></returns>
-            internal static ImageFileXfer Create(TwSetupFileXfer data) => new ImageFileXfer
+            internal static ImageFileXfer Create(TwSetupFileXfer data)
             {
-                FileName = data.FileName,
-                Format = data.Format
-            };
+                return new ImageFileXfer
+                {
+                    FileName = data.FileName,
+                    Format = data.Format
+                };
+            }
 
             /// <summary>
             /// Returns the file name.
             /// <para xml:lang="ru">Возвращает имя файла.</para>
             /// </summary>
-            public string FileName { get; private set; }
+            public string FileName
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Returns the file format.
             /// <para xml:lang="ru">Фозвращает формат файла.</para>
             /// </summary>
-            public TwFF Format { get; private set; }
+            public TwFF Format
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -3407,13 +3776,21 @@ namespace Saraff.Twain
             /// Returns the type of palette.
             /// <para xml:lang="ru">Возвращает тип палитры.</para>
             /// </summary>
-            public TwPA PaletteType { get; private set; }
+            public TwPA PaletteType
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Returns the colors that make up the palette.
             /// <para xml:lang="ru">Возвращает цвета, входящие в состав палитры.</para>
             /// </summary>
-            public Color[] Colors { get; private set; }
+            public Color[] Colors
+            {
+                get;
+                private set;
+            }
         }
 
         /// <summary>
@@ -3443,7 +3820,11 @@ namespace Saraff.Twain
             /// <value>
             /// The version.
             /// </value>
-            public Version Version { get; private set; }
+            public Version Version
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Get the protocol version.
@@ -3451,22 +3832,38 @@ namespace Saraff.Twain
             /// <value>
             /// The protocol version.
             /// </value>
-            public Version ProtocolVersion { get; private set; }
+            public Version ProtocolVersion
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Get manufacturer name, e.g. "Hewlett-Packard".
             /// </summary>
-            public string Manufacturer { get; private set; }
+            public string Manufacturer
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Get product family name, e.g. "ScanJet".
             /// </summary>
-            public string Family { get; private set; }
+            public string Family
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Get product name, e.g. "ScanJet Plus".
             /// </summary>
-            public string Name { get; private set; }
+            public string Name
+            {
+                get;
+                private set;
+            }
         }
 
         #endregion

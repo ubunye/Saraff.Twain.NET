@@ -31,6 +31,7 @@
 
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.Security.Permissions;
 
 namespace Saraff.Twain
 {
@@ -43,38 +44,13 @@ namespace Saraff.Twain
     [DebuggerDisplay("{Message}; ReturnCode = {ReturnCode}; ConditionCode = {ConditionCode}")]
     public sealed class TwainException : Exception
     {
-        private readonly static Dictionary<TwCC, string> _twcc = new Dictionary<TwCC, string> {
-            {TwCC.Success, "It worked!"},
-            {TwCC.Bummer, "Failure due to unknown causes."},
-            {TwCC.LowMemory, "Not enough memory to perform operation."},
-            {TwCC.NoDS, "No Data Source."},
-            {TwCC.MaxConnections, "DS is connected to max possible applications."},
-            {TwCC.OperationError, "DS or DSM reported error, application shouldn't."},
-            {TwCC.BadCap, "Unknown capability."},
-            {TwCC.BadProtocol, "Unrecognized MSG DG DAT combination."},
-            {TwCC.BadValue, "Data parameter out of range."},
-            {TwCC.SeqError, "DG DAT MSG out of expected sequence."},
-            {TwCC.BadDest, "Unknown destination Application/Source in DSM_Entry."},
-            {TwCC.CapUnsupported, "Capability not supported by source."},
-            {TwCC.CapBadOperation, "Operation not supported by capability."},
-            {TwCC.CapSeqError, "Capability has dependancy on other capability."},
-            /* Added 1.8 */
-            {TwCC.Denied, "File System operation is denied (file is protected)."},
-            {TwCC.FileExists, "Operation failed because file already exists."},
-            {TwCC.FileNotFound, "File not found."},
-            {TwCC.NotEmpty, "Operation failed because directory is not empty."},
-            {TwCC.PaperJam, "The feeder is jammed."},
-            {TwCC.PaperDoubleFeed, "The feeder detected multiple pages."},
-            {TwCC.FileWriteError, "Error writing the file (meant for things like disk full conditions)."},
-            {TwCC.CheckDeviceOnline, "The device went offline prior to or during this operation."}
-        };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TwainException"/> class.
         /// </summary>
         /// <param name="cc">The condition code.</param>
         /// <param name="rc">The return code.</param>
-        internal TwainException(TwCC cc, TwRC rc) : this(_CC2Message(cc))
+        internal TwainException(TwCC cc, TwRC rc) : this(_CodeToMessage(cc))
         {
             ConditionCode = cc;
             ReturnCode = rc;
@@ -118,6 +94,7 @@ namespace Saraff.Twain
         ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Read="*AllFiles*" PathDiscovery="*AllFiles*" />
         ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="SerializationFormatter" />
         /// </PermissionSet>
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -126,24 +103,69 @@ namespace Saraff.Twain
         }
 
         /// <summary>
-        /// Returns the operation status code.
-        /// <para xml:lang="ru">Возвращает код состояния операции.</para>
+        /// Returns the operation status code. Get condition code.
+        /// <para xml:lang="ru">Возвращает код состояния операции. Get condition code.</para>
         /// </summary>
         public TwCC ConditionCode { get; private set; }
 
         /// <summary>
-        /// Returns the result code of the operation.
-        /// <para xml:lang="ru">Возвращает код результата операции.</para>
+        /// Returns the result code of the operation. Get return code.
+        /// <para xml:lang="ru">Возвращает код результата операции. Get return code.</para>
         /// </summary>
         public TwRC ReturnCode { get; private set; }
 
-        private static string _CC2Message(TwCC code)
+        private static string _CodeToMessage(TwCC code)
         {
-            if (_twcc.TryGetValue(code, out var _result))
+            switch (code)
             {
-                return _result;
+                case TwCC.Success:
+                    return "Scan cancelled!";
+                case TwCC.Bummer:
+                    return "Failure due to unknown causes.";
+                case TwCC.LowMemory:
+                    return "Not enough memory to perform operation.";
+                case TwCC.NoDS:
+                    return "No Data Source.";
+                case TwCC.MaxConnections:
+                    return "DS is connected to max possible applications.";
+                case TwCC.OperationError:
+                    return "DS or DSM reported error, application shouldn't.";
+                case TwCC.BadCap:
+                    return "Unknown capability.";
+                case TwCC.BadProtocol:
+                    return "Unrecognized MSG DG DAT combination.";
+                case TwCC.BadValue:
+                    return "Data parameter out of range.";
+                case TwCC.SeqError:
+                    return "DG DAT MSG out of expected sequence.";
+                case TwCC.BadDest:
+                    return "Unknown destination Application/Source in DSM_Entry.";
+                case TwCC.CapUnsupported:
+                    return "Capability not supported by source.";
+                case TwCC.CapBadOperation:
+                    return "Operation not supported by capability.";
+                case TwCC.CapSeqError:
+                    return "Capability has dependancy on other capability.";
+                /* Added 1.8 */
+                case TwCC.Denied:
+                    return "File System operation is denied (file is protected).";
+                case TwCC.FileExists:
+                    return "Operation failed because file already exists.";
+                case TwCC.FileNotFound:
+                    return "File not found.";
+                case TwCC.NotEmpty:
+                    return "Operation failed because directory is not empty.";
+                case TwCC.PaperJam:
+                    return "The feeder is jammed.";
+                case TwCC.PaperDoubleFeed:
+                    return "The feeder detected multiple pages.";
+                case TwCC.FileWriteError:
+                    return "Error writing the file (meant for things like disk full conditions).";
+                case TwCC.CheckDeviceOnline:
+                    return "The device went offline prior to or during this operation.";
+                default:
+                    return "Unknown error.";
             }
-            return "Unknown error.";
         }
     }
 }
