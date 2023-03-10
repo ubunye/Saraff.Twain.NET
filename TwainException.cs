@@ -28,14 +28,12 @@
  * 
  * PLEASE SEND EMAIL TO:  twain@saraff.ru.
  */
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 using System.Runtime.Serialization;
 using System.Diagnostics;
-using System.Security.Permissions;
 
-namespace Saraff.Twain {
+namespace Saraff.Twain
+{
 
     /// <summary>
     /// Exception class <see cref="TwainException"/>
@@ -43,7 +41,8 @@ namespace Saraff.Twain {
     /// </summary>
     [Serializable]
     [DebuggerDisplay("{Message}; ReturnCode = {ReturnCode}; ConditionCode = {ConditionCode}")]
-    public sealed class TwainException : Exception {
+    public sealed class TwainException : Exception
+    {
         private readonly static Dictionary<TwCC, string> _twcc = new Dictionary<TwCC, string> {
             {TwCC.Success, "It worked!"},
             {TwCC.Bummer, "Failure due to unknown causes."},
@@ -75,16 +74,18 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="cc">The condition code.</param>
         /// <param name="rc">The return code.</param>
-        internal TwainException(TwCC cc, TwRC rc) : this(TwainException._CC2Message(cc)) {
-            this.ConditionCode = cc;
-            this.ReturnCode = rc;
+        internal TwainException(TwCC cc, TwRC rc) : this(_CC2Message(cc))
+        {
+            ConditionCode = cc;
+            ReturnCode = rc;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TwainException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        internal TwainException(string message) : base(message) {
+        internal TwainException(string message) : base(message)
+        {
         }
 
         /// <summary>
@@ -92,7 +93,8 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">Inner exception.</param>
-        internal TwainException(string message, Exception innerException) : base(message, innerException) {
+        internal TwainException(string message, Exception innerException) : base(message, innerException)
+        {
         }
 
         /// <summary>
@@ -100,9 +102,10 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="info">An object <see cref="T:System.Runtime.Serialization.SerializationInfo" />, containing serialized object data about the thrown exception.<para xml:lang="ru">Объект <see cref="T:System.Runtime.Serialization.SerializationInfo" />, содержащий сериализованные данные объекта о выбрасываемом исключении.</para></param>
         /// <param name="context">An object <see cref="T:System.Runtime.Serialization.StreamingContext" />, containing contextual information about the source or destination.<para xml:lang="ru">Объект <see cref="T:System.Runtime.Serialization.StreamingContext" />, содержащий контекстные сведения об источнике или назначении.</para></param>
-        internal TwainException(SerializationInfo info, StreamingContext context) : base(info, context) {
-            this.ConditionCode = (TwCC)info.GetValue("ConditionCode", typeof(TwCC));
-            this.ReturnCode = (TwRC)info.GetValue("ReturnCode", typeof(TwRC));
+        internal TwainException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            ConditionCode = (TwCC)info.GetValue("ConditionCode", typeof(TwCC));
+            ReturnCode = (TwRC)info.GetValue("ReturnCode", typeof(TwRC));
         }
 
         /// <summary>
@@ -115,10 +118,11 @@ namespace Saraff.Twain {
         ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Read="*AllFiles*" PathDiscovery="*AllFiles*" />
         ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="SerializationFormatter" />
         /// </PermissionSet>
-        public override void GetObjectData(SerializationInfo info, StreamingContext context) {
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
             base.GetObjectData(info, context);
-            info.AddValue("ConditionCode", this.ConditionCode);
-            info.AddValue("ReturnCode", this.ReturnCode);
+            info.AddValue("ConditionCode", ConditionCode);
+            info.AddValue("ReturnCode", ReturnCode);
         }
 
         /// <summary>
@@ -133,8 +137,10 @@ namespace Saraff.Twain {
         /// </summary>
         public TwRC ReturnCode { get; private set; }
 
-        private static string _CC2Message(TwCC code) {
-            if(TwainException._twcc.TryGetValue(code, out var _result)) {
+        private static string _CC2Message(TwCC code)
+        {
+            if (_twcc.TryGetValue(code, out var _result))
+            {
                 return _result;
             }
             return "Unknown error.";

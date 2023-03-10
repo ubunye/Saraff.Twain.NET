@@ -28,18 +28,17 @@
  * 
  * PLEASE SEND EMAIL TO:  twain@saraff.ru.
  */
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Drawing;
+
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.IO;
 using System.Collections.ObjectModel;
 
-namespace Saraff.Twain {
+namespace Saraff.Twain
+{
 
-    internal sealed class Tiff : _ImageHandler {
+    internal sealed class Tiff : _ImageHandler
+    {
 
         /// <summary>
         /// Convert a block of unmanaged memory to stream.
@@ -47,8 +46,10 @@ namespace Saraff.Twain {
         /// <param name="ptr">The pointer to block of unmanaged memory.</param>
         /// <param name="stream"></param>
         /// <exception cref="NotSupportedException"></exception>
-        protected override void PtrToStreamCore(IntPtr ptr, Stream stream) {
-            if(this.Header.magic == MagicValues.BigEndian) {
+        protected override void PtrToStreamCore(IntPtr ptr, Stream stream)
+        {
+            if (Header.magic == MagicValues.BigEndian)
+            {
                 throw new NotSupportedException();
             }
             base.PtrToStreamCore(ptr, stream);
@@ -60,22 +61,29 @@ namespace Saraff.Twain {
         /// <returns>
         /// Size of a image data.
         /// </returns>
-        protected override int GetSize() {
-            if(!this.HandlerState.ContainsKey("TIFFSIZE")) {
+        protected override int GetSize()
+        {
+            if (!HandlerState.ContainsKey("TIFFSIZE"))
+            {
                 int _size = 0;
-                for(Tiff.Ifd _idf = this.ImageFileDirectory; _idf != null; _idf = _idf.NextIfd) {
-                    if(_idf.Offset + _idf.Size > _size) {
+                for (Ifd _idf = ImageFileDirectory; _idf != null; _idf = _idf.NextIfd)
+                {
+                    if (_idf.Offset + _idf.Size > _size)
+                    {
                         _size = _idf.Offset + _idf.Size;
                     }
 
-                    Tiff.IfdEntry _stripOffsetsTag = null, _stripByteCountsTag = null;
-                    Tiff.IfdEntry _freeOffsets = null, _freeByteCounts = null;
-                    Tiff.IfdEntry _tileOffsets = null, _tileByteCounts = null;
-                    foreach(IfdEntry _entry in _idf) {
-                        if(_entry.DataOffset + _entry.DataSize > _size) {
+                    IfdEntry _stripOffsetsTag = null, _stripByteCountsTag = null;
+                    IfdEntry _freeOffsets = null, _freeByteCounts = null;
+                    IfdEntry _tileOffsets = null, _tileByteCounts = null;
+                    foreach (IfdEntry _entry in _idf)
+                    {
+                        if (_entry.DataOffset + _entry.DataSize > _size)
+                        {
                             _size = _entry.DataOffset + _entry.DataSize;
                         }
-                        switch(_entry.Tag) {
+                        switch (_entry.Tag)
+                        {
                             case TiffTags.STRIPOFFSETS:
                                 _stripOffsetsTag = _entry;
                                 break;
@@ -96,21 +104,25 @@ namespace Saraff.Twain {
                                 break;
                         }
                     }
-                    foreach(IfdEntry[] _item in new Tiff.IfdEntry[][] { new[] { _stripOffsetsTag, _stripByteCountsTag }, new[] { _freeOffsets, _freeByteCounts }, new[] { _tileOffsets, _tileByteCounts } }) {
-                        if(_item[0] != null && _item[1] != null && _item[0].Length == _item[1].Length) {
-                            for(int i = 0; i < _item[0].Length; i++) {
+                    foreach (IfdEntry[] _item in new IfdEntry[][] { new[] { _stripOffsetsTag, _stripByteCountsTag }, new[] { _freeOffsets, _freeByteCounts }, new[] { _tileOffsets, _tileByteCounts } })
+                    {
+                        if (_item[0] != null && _item[1] != null && _item[0].Length == _item[1].Length)
+                        {
+                            for (int i = 0; i < _item[0].Length; i++)
+                            {
                                 int _dataOffset = Convert.ToInt32(_item[0][i]);
                                 int _dataSize = Convert.ToInt32(_item[1][i]);
-                                if(_dataOffset + _dataSize > _size) {
+                                if (_dataOffset + _dataSize > _size)
+                                {
                                     _size = _dataOffset + _dataSize;
                                 }
                             }
                         }
                     }
                 }
-                this.HandlerState.Add("TIFFSIZE", _size);
+                HandlerState.Add("TIFFSIZE", _size);
             }
-            return (int)this.HandlerState["TIFFSIZE"];
+            return (int)HandlerState["TIFFSIZE"];
         }
 
         /// <summary>
@@ -121,21 +133,27 @@ namespace Saraff.Twain {
         /// </value>
         protected override int BufferSize => 256 * 1024; //256K
 
-        private TiffHeader Header {
-            get {
-                if(!this.HandlerState.ContainsKey("TiffHeader")) {
-                    this.HandlerState.Add("TiffHeader", Marshal.PtrToStructure(this.ImagePointer, typeof(TiffHeader)));
+        private TiffHeader Header
+        {
+            get
+            {
+                if (!HandlerState.ContainsKey("TiffHeader"))
+                {
+                    HandlerState.Add("TiffHeader", Marshal.PtrToStructure(ImagePointer, typeof(TiffHeader)));
                 }
-                return this.HandlerState["TiffHeader"] as TiffHeader;
+                return HandlerState["TiffHeader"] as TiffHeader;
             }
         }
 
-        private Tiff.Ifd ImageFileDirectory {
-            get {
-                if(!this.HandlerState.ContainsKey("ImageFileDirectory")) {
-                    this.HandlerState.Add("ImageFileDirectory", Ifd.FromPtr((IntPtr)(this.ImagePointer.ToInt64() + this.Header.dirOffset), this.ImagePointer));
+        private Ifd ImageFileDirectory
+        {
+            get
+            {
+                if (!HandlerState.ContainsKey("ImageFileDirectory"))
+                {
+                    HandlerState.Add("ImageFileDirectory", Ifd.FromPtr((IntPtr)(ImagePointer.ToInt64() + Header.dirOffset), ImagePointer));
                 }
-                return this.HandlerState["ImageFileDirectory"] as Tiff.Ifd;
+                return HandlerState["ImageFileDirectory"] as Ifd;
             }
         }
 
@@ -145,7 +163,8 @@ namespace Saraff.Twain {
         /// TIFF header.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        private sealed class TiffHeader {
+        private sealed class TiffHeader
+        {
 
             /// <summary>
             /// Magic number (defines byte order).
@@ -164,7 +183,8 @@ namespace Saraff.Twain {
             public uint dirOffset;
         }
 
-        private enum MagicValues : ushort {
+        private enum MagicValues : ushort
+        {
             BigEndian = 0x4d4d,
             LittleEndian = 0x4949
         }
@@ -180,7 +200,8 @@ namespace Saraff.Twain {
         ///  left-justified in the offset field.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        private sealed class TiffDirEntry {
+        private sealed class TiffDirEntry
+        {
 
             /// <summary>
             /// Tag id.
@@ -209,13 +230,16 @@ namespace Saraff.Twain {
         /// Image File Directory.
         /// </summary>
         [DebuggerDisplay("{Tag}; DataType = {DataType}; Length = {Length}")]
-        private sealed class IfdEntry {
+        private sealed class IfdEntry
+        {
             private Array _data;
 
-            public static Tiff.IfdEntry FromPtr(IntPtr ptr, IntPtr baseAddr) {
+            public static IfdEntry FromPtr(IntPtr ptr, IntPtr baseAddr)
+            {
                 TiffDirEntry _entry = (TiffDirEntry)Marshal.PtrToStructure(ptr, typeof(TiffDirEntry));
 
-                Tiff.IfdEntry _ifdEntry = new Tiff.IfdEntry {
+                IfdEntry _ifdEntry = new IfdEntry
+                {
                     Tag = _entry.tag,
                     DataType = _entry.type,
                     _data = Array.CreateInstance(TiffDataTypeHelper.Typeof(_entry.type), _entry.count <= int.MaxValue ? _entry.count : 0)
@@ -223,7 +247,8 @@ namespace Saraff.Twain {
 
                 IntPtr _dataPtr = (IntPtr)(((_ifdEntry.DataSize = (int)(TiffDataTypeHelper.Sizeof(_entry.type) * _ifdEntry._data.Length)) > 4) ? baseAddr.ToInt64() + _entry.offset : ptr.ToInt64() + 8);
                 _ifdEntry.DataOffset = (int)(_dataPtr.ToInt64() - baseAddr.ToInt64());
-                for(int i = 0, _size = TiffDataTypeHelper.Sizeof(_entry.type); i < _ifdEntry._data.Length; i++) {
+                for (int i = 0, _size = TiffDataTypeHelper.Sizeof(_entry.type); i < _ifdEntry._data.Length; i++)
+                {
                     _ifdEntry._data.SetValue(Marshal.PtrToStructure((IntPtr)(_dataPtr.ToInt64() + _size * i), TiffDataTypeHelper.Typeof(_entry.type)), i);
                 }
 
@@ -238,43 +263,52 @@ namespace Saraff.Twain {
 
             public int DataSize { get; private set; }
 
-            public int Length => this._data.Length;
+            public int Length => _data.Length;
 
-            public object this[int index] => this._data.GetValue(index);
+            public object this[int index] => _data.GetValue(index);
         }
 
-        private sealed class Ifd : Collection<Tiff.IfdEntry> {
+        private sealed class Ifd : Collection<IfdEntry>
+        {
 
-            public static Tiff.Ifd FromPtr(IntPtr ptr, IntPtr baseAddr) {
-                Tiff.Ifd _idf = new Tiff.Ifd();
+            public static Ifd FromPtr(IntPtr ptr, IntPtr baseAddr)
+            {
+                Ifd _idf = new Ifd();
                 _idf.Load(ptr, baseAddr);
                 return _idf;
             }
 
-            private void Load(IntPtr ptr, IntPtr baseAddr) {
+            private void Load(IntPtr ptr, IntPtr baseAddr)
+            {
                 ushort _count = (ushort)Marshal.PtrToStructure(ptr, typeof(ushort));
                 IntPtr _ptr = (IntPtr)(ptr.ToInt64() + sizeof(ushort));
-                for(int i = 0, _size = Marshal.SizeOf(typeof(TiffDirEntry)); i < _count; i++, _ptr = (IntPtr)(_ptr.ToInt64() + _size)) {
-                    this.Add(Tiff.IfdEntry.FromPtr(_ptr, baseAddr));
+                for (int i = 0, _size = Marshal.SizeOf(typeof(TiffDirEntry)); i < _count; i++, _ptr = (IntPtr)(_ptr.ToInt64() + _size))
+                {
+                    Add(IfdEntry.FromPtr(_ptr, baseAddr));
                 }
                 int _nextIdfOffset = (int)Marshal.PtrToStructure(_ptr, typeof(int));
-                if(_nextIdfOffset != 0) {
-                    this.NextIfd = Ifd.FromPtr((IntPtr)(baseAddr.ToInt64() + _nextIdfOffset), baseAddr);
+                if (_nextIdfOffset != 0)
+                {
+                    NextIfd = FromPtr((IntPtr)(baseAddr.ToInt64() + _nextIdfOffset), baseAddr);
                 }
-                this.Offset = (int)(ptr.ToInt64() - baseAddr.ToInt64());
-                this.Size = 6 + Marshal.SizeOf(typeof(Tiff.TiffDirEntry)) * _count;
+                Offset = (int)(ptr.ToInt64() - baseAddr.ToInt64());
+                Size = 6 + Marshal.SizeOf(typeof(TiffDirEntry)) * _count;
             }
 
             public int Offset { get; private set; }
 
             public int Size { get; private set; }
 
-            public Tiff.Ifd NextIfd { get; private set; }
+            public Ifd NextIfd { get; private set; }
 
-            public Tiff.IfdEntry this[TiffTags tag] {
-                get {
-                    for(int i = 0; i < this.Count; i++) {
-                        if(this[i].Tag == tag) {
+            public IfdEntry this[TiffTags tag]
+            {
+                get
+                {
+                    for (int i = 0; i < Count; i++)
+                    {
+                        if (this[i].Tag == tag)
+                        {
                             return this[i];
                         }
                     }
@@ -287,7 +321,8 @@ namespace Saraff.Twain {
         /// Tag data type information.
         /// </summary>
         /// <remarks>RATIONALs are the ratio of two 32-bit integer values.</remarks>
-        private enum TiffDataType : ushort {
+        private enum TiffDataType : ushort
+        {
 
             /// <summary>
             /// Placeholder.
@@ -360,30 +395,42 @@ namespace Saraff.Twain {
             TIFF_IFD = 13
         }
 
-        private sealed class TiffDataTypeHelper {
+        private sealed class TiffDataTypeHelper
+        {
             private static Dictionary<TiffDataType, int> _sizeDictionary;
             private static Dictionary<TiffDataType, Type> _typeDictionary;
 
-            public static int Sizeof(TiffDataType type) {
-                try {
-                    return TiffDataTypeHelper.SizeDictionary[type];
-                } catch(KeyNotFoundException) {
+            public static int Sizeof(TiffDataType type)
+            {
+                try
+                {
+                    return SizeDictionary[type];
+                }
+                catch (KeyNotFoundException)
+                {
                     return 0;
                 }
             }
 
-            public static Type Typeof(TiffDataType type) {
-                try {
-                    return TiffDataTypeHelper.TypeDictionary[type];
-                } catch(KeyNotFoundException) {
+            public static Type Typeof(TiffDataType type)
+            {
+                try
+                {
+                    return TypeDictionary[type];
+                }
+                catch (KeyNotFoundException)
+                {
                     return typeof(object);
                 }
             }
 
-            private static Dictionary<TiffDataType, int> SizeDictionary {
-                get {
-                    if(TiffDataTypeHelper._sizeDictionary == null) {
-                        TiffDataTypeHelper._sizeDictionary = new Dictionary<TiffDataType, int> {
+            private static Dictionary<TiffDataType, int> SizeDictionary
+            {
+                get
+                {
+                    if (_sizeDictionary == null)
+                    {
+                        _sizeDictionary = new Dictionary<TiffDataType, int> {
                             {TiffDataType.TIFF_NOTYPE,0},
                             {TiffDataType.TIFF_BYTE,1},
                             {TiffDataType.TIFF_ASCII,1},
@@ -400,14 +447,17 @@ namespace Saraff.Twain {
                             {TiffDataType.TIFF_IFD,4}
                         };
                     }
-                    return TiffDataTypeHelper._sizeDictionary;
+                    return _sizeDictionary;
                 }
             }
 
-            private static Dictionary<TiffDataType, Type> TypeDictionary {
-                get {
-                    if(TiffDataTypeHelper._typeDictionary == null) {
-                        TiffDataTypeHelper._typeDictionary = new Dictionary<TiffDataType, Type> {
+            private static Dictionary<TiffDataType, Type> TypeDictionary
+            {
+                get
+                {
+                    if (_typeDictionary == null)
+                    {
+                        _typeDictionary = new Dictionary<TiffDataType, Type> {
                             {TiffDataType.TIFF_NOTYPE,typeof(object)},
                             {TiffDataType.TIFF_BYTE,typeof(byte)},
                             {TiffDataType.TIFF_ASCII,typeof(byte)},
@@ -424,7 +474,7 @@ namespace Saraff.Twain {
                             {TiffDataType.TIFF_IFD,typeof(int)}
                         };
                     }
-                    return TiffDataTypeHelper._typeDictionary;
+                    return _typeDictionary;
                 }
             }
         }
@@ -432,7 +482,8 @@ namespace Saraff.Twain {
         /// <summary>
         /// TIFF Tag Definitions.
         /// </summary>
-        private enum TiffTags : ushort {
+        private enum TiffTags : ushort
+        {
             SUBFILETYPE = 254, /* subfile data descriptor */
             OSUBFILETYPE = 255, /* +kind of data in subfile */
             IMAGEWIDTH = 256, /* image width in pixels */
@@ -673,19 +724,22 @@ namespace Saraff.Twain {
 
         #region Not used / Не используется
 
-        private enum SubFileTypeValues {
+        private enum SubFileTypeValues
+        {
             REDUCEDIMAGE = 0x1, /* reduced resolution version */
             PAGE = 0x2, /* one page of many */
             MASK = 0x4, /* transparency mask */
         }
 
-        private enum OSubFileTypeValues {
+        private enum OSubFileTypeValues
+        {
             IMAGE = 1, /* full resolution image data */
             REDUCEDIMAGE = 2, /* reduced size image data */
             PAGE = 3, /* one page of many */
         }
 
-        private enum CompressionValues {
+        private enum CompressionValues
+        {
             NONE = 1, /* dump mode */
             CCITTRLE = 2, /* CCITT modified Huffman RLE */
             CCITTFAX3 = 3, /* CCITT Group 3 fax encoding */
@@ -720,7 +774,8 @@ namespace Saraff.Twain {
             JP2000 = 34712, /* Leadtools JPEG2000 */
         }
 
-        private enum PhotoMetricValues {
+        private enum PhotoMetricValues
+        {
             MINISWHITE = 0, /* min value is white */
             MINISBLACK = 1, /* min value is black */
             RGB = 2, /* RGB color model */
@@ -735,18 +790,21 @@ namespace Saraff.Twain {
             LOGLUV = 32845, /* CIE Log2(L) (u',v') */
         }
 
-        private enum ThreshHoldingValues {
+        private enum ThreshHoldingValues
+        {
             BILEVEL = 1, /* b&w art scan */
             HALFTONE = 2, /* or dithered scan */
             ERRORDIFFUSE = 3, /* usually floyd-steinberg */
         }
 
-        private enum FillOrderValues {
+        private enum FillOrderValues
+        {
             MSB2LSB = 1, /* most significant -> least */
             LSB2MSB = 2, /* least significant -> most */
         }
 
-        private enum OrientationValues {
+        private enum OrientationValues
+        {
             TOPLEFT = 1, /* row 0 top, col 0 lhs */
             TOPRIGHT = 2, /* row 0 top, col 0 rhs */
             BOTRIGHT = 3, /* row 0 bottom, col 0 rhs */
@@ -757,12 +815,14 @@ namespace Saraff.Twain {
             LEFTBOT = 8, /* row 0 lhs, col 0 bottom */
         }
 
-        private enum PlanarConfigValues {
+        private enum PlanarConfigValues
+        {
             CONTIG = 1, /* single image plane */
             SEPARATE = 2, /* separate planes of data */
         }
 
-        private enum GrayResponseUnitValues {
+        private enum GrayResponseUnitValues
+        {
             _10S = 1, /* tenths of a unit */
             _100S = 2, /* hundredths of a unit */
             _1000S = 3, /* thousandths of a unit */
@@ -770,23 +830,27 @@ namespace Saraff.Twain {
             _100000S = 5, /* hundred-thousandths */
         }
 
-        private enum Group3OptionsValues {
+        private enum Group3OptionsValues
+        {
             _2DENCODING = 0x1, /* 2-dimensional coding */
             UNCOMPRESSED = 0x2, /* data not compressed */
             FILLBITS = 0x4, /* fill to byte boundary */
         }
 
-        private enum Group4OptionsValues {
+        private enum Group4OptionsValues
+        {
             UNCOMPRESSED = 0x2, /* data not compressed */
         }
 
-        private enum ResolutionUnitValues {
+        private enum ResolutionUnitValues
+        {
             NONE = 1, /* no meaningful units */
             INCH = 2, /* english */
             CENTIMETER = 3, /* metric */
         }
 
-        private enum ColorResponseUnitValues {
+        private enum ColorResponseUnitValues
+        {
             _10S = 1, /* tenths of a unit */
             _100S = 2, /* hundredths of a unit */
             _1000S = 3, /* thousandths of a unit */
@@ -794,30 +858,35 @@ namespace Saraff.Twain {
             _100000S = 5, /* hundred-thousandths */
         }
 
-        private enum PredictorValues {
+        private enum PredictorValues
+        {
             NONE = 1, /* no prediction scheme used */
             HORIZONTAL = 2, /* horizontal differencing */
             FLOATINGPOINT = 3, /* floating point predictor */
         }
 
-        private enum CleanFaxDataValues {
+        private enum CleanFaxDataValues
+        {
             CLEAN = 0, /* no errors detected */
             REGENERATED = 1, /* receiver regenerated lines */
             UNCLEAN = 2, /* uncorrected errors exist */
         }
 
-        private enum InkSetValues {
+        private enum InkSetValues
+        {
             CMYK = 1, /* !cyan-magenta-yellow-black color */
             MULTIINK = 2, /* !multi-ink or hi-fi color */
         }
 
-        private enum ExtraSamplesValues {
+        private enum ExtraSamplesValues
+        {
             UNSPECIFIED = 0, /* !unspecified data */
             ASSOCALPHA = 1, /* !associated alpha data */
             UNASSALPHA = 2, /* !unassociated alpha data */
         }
 
-        private enum SampleFormatValues {
+        private enum SampleFormatValues
+        {
             UINT = 1, /* !unsigned integer data */
             INT = 2, /* !signed integer data */
             IEEEFP = 3, /* !IEEE floating point data */
@@ -826,12 +895,14 @@ namespace Saraff.Twain {
             COMPLEXIEEEFP = 6, /* !complex ieee floating */
         }
 
-        private enum JpegProcValues {
+        private enum JpegProcValues
+        {
             BASELINE = 1, /* !baseline sequential */
             LOSSLESS = 14, /* !Huffman coded lossless */
         }
 
-        private enum YcbcrPositionINValues {
+        private enum YcbcrPositionINValues
+        {
             CENTERED = 1, /* !as in PostScript Level 2 */
             COSITED = 2, /* !as in CCIR 601-1 */
         }

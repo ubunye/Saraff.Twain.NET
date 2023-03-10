@@ -28,14 +28,12 @@
  * 
  * PLEASE SEND EMAIL TO:  twain@saraff.ru.
  */
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using System.Drawing;
 
-namespace Saraff.Twain {
+namespace Saraff.Twain
+{
 
     #region Generic Constants
 
@@ -43,7 +41,8 @@ namespace Saraff.Twain {
     /// Data Groups.
     /// </summary>
     [Flags]
-    internal enum TwDG : uint {									// DG_.....
+    internal enum TwDG : uint
+    {									// DG_.....
 
         /// <summary>
         /// Data pertaining to control.
@@ -79,7 +78,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Data codes.
     /// </summary>
-    internal enum TwDAT : ushort {									// DAT_....
+    internal enum TwDAT : ushort
+    {									// DAT_....
 
         #region Data Argument Types for the DG_CONTROL Data Group.
 
@@ -133,7 +133,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Messages.
     /// </summary>
-    internal enum TwMSG : ushort {									// MSG_.....
+    internal enum TwMSG : ushort
+    {									// MSG_.....
 
         #region Generic messages may be used with any of several DATs.
 
@@ -310,7 +311,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Return Codes
     /// </summary>
-    public enum TwRC : ushort {                                   // TWRC_....
+    public enum TwRC : ushort
+    {                                   // TWRC_....
 
         /// <summary>
         /// Operation was successful.
@@ -381,7 +383,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Condition Codes
     /// </summary>
-    public enum TwCC : ushort {                                   // TWCC_....
+    public enum TwCC : ushort
+    {                                   // TWCC_....
 
         /// <summary>
         /// Operation was successful. This value should only be paired with TWRC_SUCCESS.
@@ -549,7 +552,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Generic Constants
     /// </summary>
-    internal enum TwOn : ushort {									// TWON_....
+    internal enum TwOn : ushort
+    {									// TWON_....
 
         /// <summary>
         /// Indicates TW_ARRAY container
@@ -576,7 +580,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Data Types
     /// </summary>
-    internal enum TwType : ushort {									// TWTY_....
+    internal enum TwType : ushort
+    {									// TWTY_....
         Int8 = 0x0000,
         Int16 = 0x0001,
         Int32 = 0x0002,
@@ -599,7 +604,8 @@ namespace Saraff.Twain {
     /// Helper class for twain types.
     /// <para xml:lang="ru">Вспомогательный класс для типов twain.</para>
     /// </summary>
-    internal sealed class TwTypeHelper {
+    internal sealed class TwTypeHelper
+    {
         private static Dictionary<TwType, Type> _typeof = new Dictionary<TwType, Type> {
             {TwType.Int8,typeof(sbyte)},
             {TwType.Int16,typeof(short)},
@@ -633,8 +639,9 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="type">Type code given by twain.<para xml:lang="ru">Код типа данный twain.</para></param>
         /// <returns>Managed type.<para xml:lang="ru">Управляемый тип.</para></returns>
-        internal static Type TypeOf(TwType type) {
-            return TwTypeHelper._typeof[type];
+        internal static Type TypeOf(TwType type)
+        {
+            return _typeof[type];
         }
 
         /// <summary>
@@ -643,20 +650,26 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="type">Managed type.<para xml:lang="ru">Управляемый тип.</para></param>
         /// <returns>Type code given by twain.<para xml:lang="ru">Код типа данный twain.</para></returns>
-        internal static TwType TypeOf(Type type) {
+        internal static TwType TypeOf(Type type)
+        {
             Type _type = type.IsEnum ? Enum.GetUnderlyingType(type) : type;
-            foreach(var _item in TwTypeHelper._typeof) {
-                if(_item.Value == _type) {
+            foreach (var _item in _typeof)
+            {
+                if (_item.Value == _type)
+                {
                     return _item.Key;
                 }
             }
-            if(type == typeof(bool)) {
+            if (type == typeof(bool))
+            {
                 return TwType.Bool;
             }
-            if(type == typeof(float)) {
+            if (type == typeof(float))
+            {
                 return TwType.Fix32;
             }
-            if(type == typeof(RectangleF)) {
+            if (type == typeof(RectangleF))
+            {
                 return TwType.Frame;
             }
             throw new KeyNotFoundException();
@@ -668,11 +681,13 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="obj">An object.<para xml:lang="ru">Объект.</para></param>
         /// <returns>Type code given by twain.<para xml:lang="ru">Код типа данный twain.</para></returns>
-        internal static TwType TypeOf(object obj) {
-            if(obj is string) {
-                return TwTypeHelper._typeofAux[((string)obj).Length];
+        internal static TwType TypeOf(object obj)
+        {
+            if (obj is string)
+            {
+                return _typeofAux[((string)obj).Length];
             }
-            return TwTypeHelper.TypeOf(obj.GetType());
+            return TypeOf(obj.GetType());
         }
 
         /// <summary>
@@ -681,8 +696,9 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="type">Type code given by twain.<para xml:lang="ru">Код типа данный twain.</para></param>
         /// <returns>Size in bytes.<para xml:lang="ru">Размер в байтах.</para></returns>
-        internal static int SizeOf(TwType type) {
-            return Marshal.SizeOf(TwTypeHelper._typeof[type]);
+        internal static int SizeOf(TwType type)
+        {
+            return Marshal.SizeOf(_typeof[type]);
         }
 
         /// <summary>
@@ -692,8 +708,10 @@ namespace Saraff.Twain {
         /// <param name="type">Twain type code.<para xml:lang="ru">Код twain-типа.</para></param>
         /// <param name="value">Instance of the object.<para xml:lang="ru">Экземпляр объекта.</para></param>
         /// <returns>Instance of the object.<para xml:lang="ru">Экземпляр объекта.</para></returns>
-        internal static object CastToCommon(TwType type, object value) {
-            switch(type) {
+        internal static object CastToCommon(TwType type, object value)
+        {
+            switch (type)
+            {
                 case TwType.Bool:
                     return (bool)(TwBool)value;
                 case TwType.Fix32:
@@ -718,8 +736,10 @@ namespace Saraff.Twain {
         /// <param name="type">Twain type code.<para xml:lang="ru">Код twain-типа.</para></param>
         /// <param name="value">Instance of the object.<para xml:lang="ru">Экземпляр объекта.</para></param>
         /// <returns>Instance of the object.<para xml:lang="ru">Экземпляр объекта.</para></returns>
-        internal static object CastToTw(TwType type, object value) {
-            switch(type) {
+        internal static object CastToTw(TwType type, object value)
+        {
+            switch (type)
+            {
                 case TwType.Bool:
                     return (TwBool)(bool)value;
                 case TwType.Fix32:
@@ -741,7 +761,8 @@ namespace Saraff.Twain {
             }
 
             Type _type = value.GetType();
-            if(_type.IsEnum && Enum.GetUnderlyingType(_type) == TwTypeHelper.TypeOf(type)) {
+            if (_type.IsEnum && Enum.GetUnderlyingType(_type) == TypeOf(type))
+            {
                 return Convert.ChangeType(value, Enum.GetUnderlyingType(_type));
             }
 
@@ -756,14 +777,18 @@ namespace Saraff.Twain {
         /// <param name="type">Twain type code.<para xml:lang="ru">Код twain-типа.</para></param>
         /// <param name="value">Value.<para xml:lang="ru">Значение.</para></param>
         /// <returns>Instance of the object.<para xml:lang="ru">Экземпляр объекта.</para></returns>
-        internal static object ValueToTw<T>(TwType type, T value) {
+        internal static object ValueToTw<T>(TwType type, T value)
+        {
             int _size = Marshal.SizeOf(typeof(T));
             IntPtr _mem = Marshal.AllocHGlobal(_size);
             Twain32._Memory.ZeroMemory(_mem, (IntPtr)_size);
-            try {
+            try
+            {
                 Marshal.StructureToPtr(value, _mem, true);
-                return Marshal.PtrToStructure(_mem, TwTypeHelper.TypeOf(type));
-            } finally {
+                return Marshal.PtrToStructure(_mem, TypeOf(type));
+            }
+            finally
+            {
                 Marshal.FreeHGlobal(_mem);
             }
         }
@@ -775,27 +800,34 @@ namespace Saraff.Twain {
         /// <typeparam name="T">Тип значения.</typeparam>
         /// <param name="value">Instance of the object.<para xml:lang="ru">Экземпляр объекта.</para></param>
         /// <returns>Value.<para xml:lang="ru">Значение.</para></returns>
-        internal static T ValueFromTw<T>(object value) {
+        internal static T ValueFromTw<T>(object value)
+        {
             int _size = Math.Max(Marshal.SizeOf(typeof(T)), Marshal.SizeOf(value));
             IntPtr _mem = Marshal.AllocHGlobal(_size);
             Twain32._Memory.ZeroMemory(_mem, (IntPtr)_size);
-            try {
+            try
+            {
                 Marshal.StructureToPtr(value, _mem, true);
                 return (T)Marshal.PtrToStructure(_mem, typeof(T));
-            } finally {
+            }
+            finally
+            {
                 Marshal.FreeHGlobal(_mem);
             }
         }
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    internal sealed class TwTypeAttribute : Attribute {
+    internal sealed class TwTypeAttribute : Attribute
+    {
 
-        public TwTypeAttribute(TwType type) {
-            this.TwType = type;
+        public TwTypeAttribute(TwType type)
+        {
+            TwType = type;
         }
 
-        public TwType TwType {
+        public TwType TwType
+        {
             get;
             private set;
         }
@@ -804,7 +836,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Capability Constants
     /// </summary>
-    public enum TwCap : ushort {
+    public enum TwCap : ushort
+    {
         /* image data sources MAY support these caps */
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         XferCount = 0x0001,			// all data sources are REQUIRED to support these caps
@@ -1005,7 +1038,8 @@ namespace Saraff.Twain {
     /// Bit patterns: for query the operation that are supported by the data source on a capability.
     /// </summary>
     [Flags]
-    public enum TwQC : ushort { //TWQC_...
+    public enum TwQC : ushort
+    { //TWQC_...
 
         /// <summary>
         /// Returns the Current, Default and Available settings for a capability.
@@ -1054,7 +1088,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Language Constants
     /// </summary>
-    public enum TwLanguage : ushort {
+    public enum TwLanguage : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         DANISH = 0,             /* Danish                 */
         DUTCH = 1,              /* Dutch                  */
@@ -1177,7 +1212,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Country Constantsz
     /// </summary>
-    public enum TwCountry : ushort {
+    public enum TwCountry : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         AFGHANISTAN = 1001,
         ALGERIA = 213,
@@ -1425,7 +1461,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Unit of measure
     /// </summary>
-    public enum TwUnits : ushort { //ICAP_UNITS values (UN_ means UNits)
+    public enum TwUnits : ushort
+    { //ICAP_UNITS values (UN_ means UNits)
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Inches = 0,
         Centimeters = 1,
@@ -1440,7 +1477,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Pixel types
     /// </summary>
-    public enum TwPixelType : ushort { //ICAP_PIXELTYPE values (PT_ means Pixel Type)
+    public enum TwPixelType : ushort
+    { //ICAP_PIXELTYPE values (PT_ means Pixel Type)
 
         /// <summary>
         /// Black and white
@@ -1465,7 +1503,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Compression values
     /// </summary>
-    public enum TwCompression : ushort { //ICAP_COMPRESSION values (CP_ means ComPression )
+    public enum TwCompression : ushort
+    { //ICAP_COMPRESSION values (CP_ means ComPression )
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         PackBits = 1,
@@ -1518,7 +1557,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Extended Image Info Attributes.
     /// </summary>
-    public enum TwEI : ushort { //TWEI_xxxx
+    public enum TwEI : ushort
+    { //TWEI_xxxx
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         BarCodeX = 0x1200,
         BarCodeY = 0x1201,
@@ -1601,7 +1641,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_XFERMECH values (SX_ means Setup XFer)
     /// </summary>
-    public enum TwSX : ushort {
+    public enum TwSX : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Native = 0,
         File = 1,
@@ -1614,7 +1655,8 @@ namespace Saraff.Twain {
     /// Flags used in TW_MEMORY structure.
     /// </summary>
     [Flags]
-    internal enum TwMF : uint {
+    internal enum TwMF : uint
+    {
         AppOwns = 0x1,
         DsmOwns = 0x2,
         DSOwns = 0x4,
@@ -1625,7 +1667,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_SUPPORTEDSIZES values (SS_ means Supported Sizes).
     /// </summary>
-    public enum TwSS : ushort {
+    public enum TwSS : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         A4Letter = 1,
@@ -1694,7 +1737,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_IMAGEFILEFORMAT values (FF_means File Format).
     /// </summary>
-    public enum TwFF : ushort {
+    public enum TwFF : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
 
         /// <summary>
@@ -1776,7 +1820,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Palette types for TW_PALETTE8.
     /// </summary>
-    public enum TwPA : ushort {
+    public enum TwPA : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         RGB = 0,
         Gray = 1,
@@ -1787,7 +1832,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_DEVICEEVENT values (DE_ means device event).
     /// </summary>
-    public enum TwDE : ushort {
+    public enum TwDE : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         CustomEvents = 0x8000,
         CheckAutomaticCapture = 0,
@@ -1813,7 +1859,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_DUPLEX values.
     /// </summary>
-    public enum TwDX : ushort {
+    public enum TwDX : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,          // TWDX_NONE
         OnePassDuplex = 1, // TWDX_1PASSDUPLEX
@@ -1824,7 +1871,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_AUTODISCARDBLANKPAGES values.
     /// </summary>
-    public enum TwBP : int {
+    public enum TwBP : int
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Disable = -2, // TWBP_DISABLE
         Auto = -1  // TWBP_AUTO
@@ -1834,7 +1882,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_AUTOSIZE values.
     /// </summary>
-    public enum TwAS : ushort {
+    public enum TwAS : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Auto = 1,
@@ -1845,7 +1894,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_FLIPROTATION values (FR_ means flip rotation).
     /// </summary>
-    public enum TwFR : ushort {
+    public enum TwFR : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Book = 0,
         Fanfold = 1
@@ -1855,7 +1905,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_IMAGEMERGE values.
     /// </summary>
-    public enum TwIM : ushort {
+    public enum TwIM : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         FrontOnTop = 1,
@@ -1868,7 +1919,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_CAMERASIDE and TWEI_PAGESIDE values.
     /// </summary>
-    public enum TwCS : ushort {
+    public enum TwCS : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Both = 0,
         Top = 1,
@@ -1879,7 +1931,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_CLEARBUFFERS values.
     /// </summary>
-    public enum TwCB : ushort {
+    public enum TwCB : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Auto = 0,
         Clear = 1,
@@ -1890,7 +1943,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_SUPPORTEDBARCODETYPES and TWEI_BARCODETYPE values.
     /// </summary>
-    public enum TwBT : ushort {
+    public enum TwBT : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Code3Of9 = 0,
         Code2Of5Interleaved = 1,
@@ -1919,7 +1973,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_BARCODESEARCHMODE values.
     /// </summary>
-    public enum TwBD : ushort {
+    public enum TwBD : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Horz = 0,
         Vert = 1,
@@ -1931,7 +1986,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_FILTER values.
     /// </summary>
-    public enum TwFT : ushort {
+    public enum TwFT : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Red = 0,
         Green = 1,
@@ -1948,7 +2004,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_ICCPROFILE values.
     /// </summary>
-    public enum TwIC : ushort {
+    public enum TwIC : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Link = 1,
@@ -1959,7 +2016,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_PLANARCHUNKY values.
     /// </summary>
-    public enum TwPC : ushort {
+    public enum TwPC : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Chunky = 0,
         Planar = 1
@@ -1969,7 +2027,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_BITORDER values.
     /// </summary>
-    public enum TwBO : ushort {
+    public enum TwBO : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         LsbFirst = 0,
         MsbFirst = 1
@@ -1979,7 +2038,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_JPEGQUALITY values.
     /// </summary>
-    public enum TwJQ : short {
+    public enum TwJQ : short
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Unknown = -4,
         Low = -3,
@@ -1991,7 +2051,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_JPEGSUBSAMPLING values.
     /// </summary>
-    public enum TwJS : ushort {
+    public enum TwJS : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         _444Ycbcr = 0,
         _444Rgb = 1,
@@ -2007,7 +2068,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_PIXELFLAVOR values.
     /// </summary>
-    public enum TwPF : ushort {
+    public enum TwPF : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Chocolate = 0,
         Vanilla = 1
@@ -2017,7 +2079,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_FLASHUSED2 values.
     /// </summary>
-    public enum TwFL : ushort {
+    public enum TwFL : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Off = 1,
@@ -2030,7 +2093,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_IMAGEFILTER values.
     /// </summary>
-    public enum TwIF : ushort {
+    public enum TwIF : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Auto = 1,
@@ -2045,7 +2109,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_LIGHTPATH values.
     /// </summary>
-    public enum TwLP : ushort {
+    public enum TwLP : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Reflective = 0,
         Transmissive = 1
@@ -2055,7 +2120,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_LIGHTSOURCE values.
     /// </summary>
-    public enum TwLS : ushort {
+    public enum TwLS : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Red = 0,
         Green = 1,
@@ -2070,7 +2136,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_NOISEFILTER values.
     /// </summary>
-    public enum TwNF : ushort {
+    public enum TwNF : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Auto = 1,
@@ -2082,7 +2149,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_OVERSCAN values.
     /// </summary>
-    public enum TwOV : ushort {
+    public enum TwOV : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Auto = 1,
@@ -2095,7 +2163,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_DOUBLEFEEDDETECTION.
     /// </summary>
-    public enum TwDF : ushort {
+    public enum TwDF : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Ultrasonic = 0,
         ByLength = 1,
@@ -2106,7 +2175,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_DOUBLEFEEDDETECTIONSENSITIVITY.
     /// </summary>
-    public enum TwUS : ushort {
+    public enum TwUS : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Low = 0,
         Medium = 1,
@@ -2117,7 +2187,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_DOUBLEFEEDDETECTIONRESPONSE.
     /// </summary>
-    public enum TwDP : ushort {
+    public enum TwDP : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Stop = 0,
         StopAndWait = 1,
@@ -2129,7 +2200,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_PRINTER values.
     /// </summary>
-    public enum TwPR : ushort {
+    public enum TwPR : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         ImprinterTopBefore = 0,
         ImprinterTopAfter = 1,
@@ -2145,7 +2217,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_PRINTERMODE values.
     /// </summary>
-    public enum TwPM : ushort {
+    public enum TwPM : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         SingleString = 0,
         MultiString = 1,
@@ -2156,7 +2229,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_ORIENTATION values.
     /// </summary>
-    public enum TwOR : ushort {
+    public enum TwOR : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Rot0 = 0,
         Rot90 = 1,
@@ -2173,7 +2247,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_BITDEPTHREDUCTION values.
     /// </summary>
-    public enum TwBR : ushort {
+    public enum TwBR : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Threshold = 0,
         Halftone = 1,
@@ -2186,7 +2261,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_SEGMENTED values.
     /// </summary>
-    public enum TwSG : ushort {
+    public enum TwSG : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Auto = 1,
@@ -2197,7 +2273,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_FEEDERALIGNMENT values.
     /// </summary>
-    public enum TwFA : ushort {
+    public enum TwFA : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Left = 1,
@@ -2209,7 +2286,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_FEEDERORDER values.
     /// </summary>
-    public enum TwFO : ushort {
+    public enum TwFO : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         FirstPageFirst = 0,
         LastPageFirst = 1
@@ -2219,7 +2297,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_FEEDERPOCKET values.
     /// </summary>
-    public enum TwFP : ushort {
+    public enum TwFP : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         PocketError = 0,
         Pocket1 = 1,
@@ -2244,7 +2323,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_PAPERHANDLING values.
     /// </summary>
-    public enum TwPH : ushort {
+    public enum TwPH : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Normal = 0,
         Fragile = 1,
@@ -2257,7 +2337,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// ICAP_FEEDERTYPE values.
     /// </summary>
-    public enum TwFE : ushort {
+    public enum TwFE : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         General = 0,
         Photo = 1,
@@ -2267,7 +2348,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// TWEI_PATCHCODE values.
     /// </summary>
-    public enum TwPch : ushort {
+    public enum TwPch : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Patch1 = 0,
         Patch2 = 1,
@@ -2281,7 +2363,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_BATTERYMINUTES values.
     /// </summary>
-    public enum TwBM1 : int {
+    public enum TwBM1 : int
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Infinite = -2,
         CannotReport = -1
@@ -2291,7 +2374,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_BATTERYPERCENTAGE values.
     /// </summary>
-    public enum TwBM2 : short {
+    public enum TwBM2 : short
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Infinite = -2,
         CannotReport = -1
@@ -2301,7 +2385,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_POWERSUPPLY values.
     /// </summary>
-    public enum TwPS : ushort {
+    public enum TwPS : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         External = 0,
         Battery = 1
@@ -2311,7 +2396,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_JOBCONTROL values.
     /// </summary>
-    public enum TwJC : ushort {
+    public enum TwJC : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         None = 0,
         Jsic = 1,
@@ -2324,7 +2410,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_INDICATORSMODE values.
     /// </summary>
-    public enum TwCI : ushort {
+    public enum TwCI : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Info = 0,
         Warning = 1,
@@ -2336,7 +2423,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// CAP_ALARMS values.
     /// </summary>
-    public enum TwAL : ushort {
+    public enum TwAL : ushort
+    {
 #pragma warning disable CS1591 // Missing XML comment for public visible type or member / Отсутствует комментарий XML для открытого видимого типа или члена
         Alarm = 0,
         FeederError = 1,
@@ -2360,21 +2448,26 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Ansi)]
-    internal sealed class TwStr32 {
+    internal sealed class TwStr32
+    {
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 34)]
         public string Value;
 
-        public override string ToString() {
-            return this.Value;
+        public override string ToString()
+        {
+            return Value;
         }
 
-        public static implicit operator string(TwStr32 value) {
+        public static implicit operator string(TwStr32 value)
+        {
             return value != null ? value.Value : null;
         }
 
-        public static implicit operator TwStr32(string value) {
-            return new TwStr32 {
+        public static implicit operator TwStr32(string value)
+        {
+            return new TwStr32
+            {
                 Value = value
             };
         }
@@ -2386,21 +2479,26 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Ansi)]
-    internal sealed class TwStr64 {
+    internal sealed class TwStr64
+    {
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 66)]
         public string Value;
 
-        public override string ToString() {
-            return this.Value;
+        public override string ToString()
+        {
+            return Value;
         }
 
-        public static implicit operator string(TwStr64 value) {
+        public static implicit operator string(TwStr64 value)
+        {
             return value != null ? value.Value : null;
         }
 
-        public static implicit operator TwStr64(string value) {
-            return new TwStr64 {
+        public static implicit operator TwStr64(string value)
+        {
+            return new TwStr64
+            {
                 Value = value
             };
         }
@@ -2412,21 +2510,26 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Ansi)]
-    internal sealed class TwStr128 {
+    internal sealed class TwStr128
+    {
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 130)]
         public string Value;
 
-        public override string ToString() {
-            return this.Value;
+        public override string ToString()
+        {
+            return Value;
         }
 
-        public static implicit operator string(TwStr128 value) {
+        public static implicit operator string(TwStr128 value)
+        {
             return value != null ? value.Value : null;
         }
 
-        public static implicit operator TwStr128(string value) {
-            return new TwStr128 {
+        public static implicit operator TwStr128(string value)
+        {
+            return new TwStr128
+            {
                 Value = value
             };
         }
@@ -2438,21 +2541,26 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Ansi)]
-    internal sealed class TwStr255 {
+    internal sealed class TwStr255
+    {
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string Value;
 
-        public override string ToString() {
-            return this.Value;
+        public override string ToString()
+        {
+            return Value;
         }
 
-        public static implicit operator string(TwStr255 value) {
+        public static implicit operator string(TwStr255 value)
+        {
             return value != null ? value.Value : null;
         }
 
-        public static implicit operator TwStr255(string value) {
-            return new TwStr255 {
+        public static implicit operator TwStr255(string value)
+        {
+            return new TwStr255
+            {
                 Value = value
             };
         }
@@ -2464,21 +2572,26 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Unicode)]
-    internal sealed class TwUni512 {
+    internal sealed class TwUni512
+    {
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 512)]
         public string Value;
 
-        public override string ToString() {
-            return this.Value;
+        public override string ToString()
+        {
+            return Value;
         }
 
-        public static implicit operator string(TwUni512 value) {
+        public static implicit operator string(TwUni512 value)
+        {
             return value != null ? value.Value : null;
         }
 
-        public static implicit operator TwUni512(string value) {
-            return new TwUni512 {
+        public static implicit operator TwUni512(string value)
+        {
+            return new TwUni512
+            {
                 Value = value
             };
         }
@@ -2490,21 +2603,26 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{Value}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Ansi)]
-    internal sealed class TwStr1024 {
+    internal sealed class TwStr1024
+    {
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1026)]
         public string Value;
 
-        public override string ToString() {
-            return this.Value;
+        public override string ToString()
+        {
+            return Value;
         }
 
-        public static implicit operator string(TwStr1024 value) {
+        public static implicit operator string(TwStr1024 value)
+        {
             return value != null ? value.Value : null;
         }
 
-        public static implicit operator TwStr1024(string value) {
-            return new TwStr1024 {
+        public static implicit operator TwStr1024(string value)
+        {
+            return new TwStr1024
+            {
                 Value = value
             };
         }
@@ -2515,20 +2633,25 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{ToBool()}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal struct TwBool {
+    internal struct TwBool
+    {
 
         public ushort Value;
 
-        private bool ToBool() {
-            return this.Value != 0;
+        private bool ToBool()
+        {
+            return Value != 0;
         }
 
-        public static implicit operator bool(TwBool value) {
+        public static implicit operator bool(TwBool value)
+        {
             return value.ToBool();
         }
 
-        public static implicit operator TwBool(bool value) {
-            return new TwBool {
+        public static implicit operator TwBool(bool value)
+        {
+            return new TwBool
+            {
                 Value = (ushort)(value ? 1 : 0)
             };
         }
@@ -2539,7 +2662,8 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{ToFloat()}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal struct TwFix32 {									// TW_FIX32
+    internal struct TwFix32
+    {									// TW_FIX32
 
         /// <summary>
         /// The whole part.
@@ -2558,8 +2682,9 @@ namespace Saraff.Twain {
         /// <para xml:lang="ru">Приводит тип к числу с плавающей запятой.</para>
         /// </summary>
         /// <returns>Floating point number.<para xml:lang="ru">Число с плавающей точкой.</para></returns>
-        private float ToFloat() {
-            return (float)this.Whole + ((float)this.Frac / 65536.0f);
+        private float ToFloat()
+        {
+            return (float)Whole + ((float)Frac / 65536.0f);
         }
 
         /// <summary>
@@ -2568,9 +2693,11 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="f">Floating point number.<para xml:lang="ru">Число с плавающей точкой.</para></param>
         /// <returns>Instance of TwFix32.<para xml:lang="ru">Экземпляр TwFix32.</para></returns>
-        public static implicit operator TwFix32(float f) {
+        public static implicit operator TwFix32(float f)
+        {
             int i = (int)((f * 65536.0f) + 0.5f);
-            return new TwFix32() {
+            return new TwFix32()
+            {
                 Whole = (short)(i >> 16),
                 Frac = (ushort)(i & 0x0000ffff)
             };
@@ -2582,8 +2709,10 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="value">Integer.<para xml:lang="ru">Целое число.</para></param>
         /// <returns>Instance of TwFix32.<para xml:lang="ru">Экземпляр TwFix32.</para></returns>
-        public static explicit operator TwFix32(uint value) {
-            return new TwFix32() {
+        public static explicit operator TwFix32(uint value)
+        {
+            return new TwFix32()
+            {
                 Whole = (short)(value & 0x0000ffff),
                 Frac = (ushort)(value >> 16)
             };
@@ -2595,7 +2724,8 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="value">Instance of TwFix32.<para xml:lang="ru">Экземпляр TwFix32.</para></param>
         /// <returns>Floating point number.<para xml:lang="ru">Число с плавающей точкой.</para></returns>
-        public static implicit operator float(TwFix32 value) {
+        public static implicit operator float(TwFix32 value)
+        {
             return value.ToFloat();
         }
 
@@ -2605,7 +2735,8 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="value">Instance of TwFix32.<para xml:lang="ru">Экземпляр TwFix32.</para></param>
         /// <returns>Integer.<para xml:lang="ru">Целое число.</para></returns>
-        public static explicit operator uint(TwFix32 value) {
+        public static explicit operator uint(TwFix32 value)
+        {
             return (uint)(ushort)value.Whole + ((uint)value.Frac << 16);
         }
     }
@@ -2615,7 +2746,8 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{ToRectangle()}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal struct TwFrame {
+    internal struct TwFrame
+    {
 
         /// <summary>
         /// Gets or sets the x-coordinate of the left edge.
@@ -2637,20 +2769,24 @@ namespace Saraff.Twain {
         /// </summary>
         public TwFix32 Bottom;
 
-        private RectangleF ToRectangle() {
+        private RectangleF ToRectangle()
+        {
             return new RectangleF(
-                this.Left,
-                this.Top,
-                this.Right - this.Left,
-                this.Bottom - this.Top);
+                Left,
+                Top,
+                Right - Left,
+                Bottom - Top);
         }
 
-        public static implicit operator RectangleF(TwFrame value) {
+        public static implicit operator RectangleF(TwFrame value)
+        {
             return value.ToRectangle();
         }
 
-        public static implicit operator TwFrame(RectangleF value) {
-            return new TwFrame() {
+        public static implicit operator TwFrame(RectangleF value)
+        {
+            return new TwFrame()
+            {
                 Left = value.Left,
                 Top = value.Top,
                 Right = value.Right,
@@ -2668,7 +2804,8 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{ProductName}, Version = {Version.Info}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Ansi)]
-    internal class TwIdentity {									// TW_IDENTITY
+    internal class TwIdentity
+    {									// TW_IDENTITY
 
         /// <summary>
         /// Unique number.  In Windows, application hWnd.
@@ -2711,15 +2848,18 @@ namespace Saraff.Twain {
         /// </summary>
         public TwStr32 ProductName;
 
-        public override bool Equals(object obj) {
-            if(obj != null && obj is TwIdentity) {
-                return ((TwIdentity)obj).Id == this.Id;
+        public override bool Equals(object obj)
+        {
+            if (obj != null && obj is TwIdentity)
+            {
+                return ((TwIdentity)obj).Id == Id;
             }
             return false;
         }
 
-        public override int GetHashCode() {
-            return this.Id.GetHashCode();
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 
@@ -2728,7 +2868,8 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("{Info}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2, CharSet = CharSet.Ansi)]
-    internal struct TwVersion {									// TW_VERSION
+    internal struct TwVersion
+    {									// TW_VERSION
 
         /// <summary>
         /// Major revision number of the software.
@@ -2762,7 +2903,8 @@ namespace Saraff.Twain {
     /// Coordinates UI between application and data source.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwUserInterface {						    // TW_USERINTERFACE
+    internal class TwUserInterface
+    {						    // TW_USERINTERFACE
 
         /// <summary>
         /// TRUE if DS should bring up its UI
@@ -2784,7 +2926,8 @@ namespace Saraff.Twain {
     /// Application gets detailed status info from a data source with this.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwStatus {									// TW_STATUS
+    internal class TwStatus
+    {									// TW_STATUS
 
         /// <summary>
         /// Any TwCC constant
@@ -2802,7 +2945,8 @@ namespace Saraff.Twain {
     /// For passing events down from the application to the DS.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwEvent {									// TW_EVENT
+    internal class TwEvent
+    {									// TW_EVENT
 
         /// <summary>
         /// Windows pMSG or Mac pEvent.
@@ -2820,7 +2964,8 @@ namespace Saraff.Twain {
     /// Application gets detailed image info from DS with this.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwImageInfo {								// TW_IMAGEINFO
+    internal class TwImageInfo
+    {								// TW_IMAGEINFO
 
         /// <summary>
         /// Resolution in the horizontal
@@ -2881,7 +3026,8 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("InfoId = {InfoId}, ItemType = {ItemType}, ReturnCode = {ReturnCode}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwInfo : IDisposable {
+    internal class TwInfo : IDisposable
+    {
 
         /// <summary>
         /// Tag identifying an information.
@@ -2915,36 +3061,44 @@ namespace Saraff.Twain {
         /// Returns true if the element value is an unmanaged memory descriptor; otherwise false.
         /// <para xml:lang="ru">Возвращает true, если значение элемента является дескриптором неуправляемой памяти; иначе, false.</para>
         /// </summary>
-        private bool _IsValue {
-            get {
-                return this.ItemType != TwType.Handle && TwTypeHelper.SizeOf(this.ItemType) * this.NumItems <= TwTypeHelper.SizeOf(TwType.Handle);
-            }
-        }
+        private bool _IsValue => ItemType != TwType.Handle && TwTypeHelper.SizeOf(ItemType) * NumItems <= TwTypeHelper.SizeOf(TwType.Handle);
 
         /// <summary>
         /// Returns the value of an element.
         /// <para xml:lang="ru">Возвращает значение элемента.</para>
         /// </summary>
         /// <returns>The value of the item.<para xml:lang="ru">Значение элемента.</para></returns>
-        public object GetValue() {
-            var _result = new object[this.NumItems];
-            if(this._IsValue) {
-                for(long i = 0, _data = this.Item.ToInt64(), _mask = ((1L << TwTypeHelper.SizeOf(this.ItemType) * 7) << TwTypeHelper.SizeOf(this.ItemType)) - 1; i < this.NumItems; i++, _data >>= TwTypeHelper.SizeOf(this.ItemType) * 8) {
-                    _result[i] = TwTypeHelper.CastToCommon(this.ItemType, TwTypeHelper.ValueToTw<long>(this.ItemType, _data & _mask));
+        public object GetValue()
+        {
+            var _result = new object[NumItems];
+            if (_IsValue)
+            {
+                for (long i = 0, _data = Item.ToInt64(), _mask = ((1L << TwTypeHelper.SizeOf(ItemType) * 7) << TwTypeHelper.SizeOf(ItemType)) - 1; i < NumItems; i++, _data >>= TwTypeHelper.SizeOf(ItemType) * 8)
+                {
+                    _result[i] = TwTypeHelper.CastToCommon(ItemType, TwTypeHelper.ValueToTw<long>(ItemType, _data & _mask));
                 }
-            } else {
-                IntPtr _data = Twain32._Memory.Lock(this.Item);
-                try {
-                    for(int i = 0; i < this.NumItems; i++) {
-                        if(this.ItemType != TwType.Handle) {
-                            _result[i] = TwTypeHelper.CastToCommon(this.ItemType, Marshal.PtrToStructure((IntPtr)((long)_data + (TwTypeHelper.SizeOf(this.ItemType) * i)), TwTypeHelper.TypeOf(this.ItemType)));
-                        } else {
+            }
+            else
+            {
+                IntPtr _data = Twain32._Memory.Lock(Item);
+                try
+                {
+                    for (int i = 0; i < NumItems; i++)
+                    {
+                        if (ItemType != TwType.Handle)
+                        {
+                            _result[i] = TwTypeHelper.CastToCommon(ItemType, Marshal.PtrToStructure((IntPtr)((long)_data + (TwTypeHelper.SizeOf(ItemType) * i)), TwTypeHelper.TypeOf(ItemType)));
+                        }
+                        else
+                        {
                             _result[i] = Marshal.PtrToStringAnsi(_data);
                             _data = (IntPtr)((long)_data + _result[i].ToString().Length + 1);
                         }
                     }
-                } finally {
-                    Twain32._Memory.Unlock(this.Item);
+                }
+                finally
+                {
+                    Twain32._Memory.Unlock(Item);
                 }
             }
             return _result.Length == 1 ? _result[0] : _result;
@@ -2952,10 +3106,12 @@ namespace Saraff.Twain {
 
         #region IDisposable
 
-        public void Dispose() {
-            if(this.Item != IntPtr.Zero && !this._IsValue) {
-                Twain32._Memory.Free(this.Item);
-                this.Item = IntPtr.Zero;
+        public void Dispose()
+        {
+            if (Item != IntPtr.Zero && !_IsValue)
+            {
+                Twain32._Memory.Free(Item);
+                Item = IntPtr.Zero;
             }
         }
 
@@ -2966,7 +3122,8 @@ namespace Saraff.Twain {
     /// This structure is used to pass extended image information from the Data Source to the Application at the end of State 7.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwExtImageInfo {
+    internal class TwExtImageInfo
+    {
 
         /// <summary>
         /// The number of elements in the extended image description.
@@ -2983,12 +3140,14 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="info">A set of elements for an extended image description.<para xml:lang="ru">Набор элементов расширенного описания изображения.</para></param>
         /// <returns>Pointer to an unmanaged memory block.<para xml:lang="ru">Указатель на блок неуправляемой памяти.</para></returns>
-        public static IntPtr ToPtr(TwInfo[] info) {
+        public static IntPtr ToPtr(TwInfo[] info)
+        {
             var _twExtImageInfoSize = Marshal.SizeOf(typeof(TwExtImageInfo));
             var _twInfoSize = Marshal.SizeOf(typeof(TwInfo));
             var _data = Marshal.AllocHGlobal(_twExtImageInfoSize + (_twInfoSize * info.Length));
             Marshal.StructureToPtr(new TwExtImageInfo { NumInfos = (uint)info.Length }, _data, true);
-            for(int i = 0; i < info.Length; i++) {
+            for (int i = 0; i < info.Length; i++)
+            {
                 Marshal.StructureToPtr(info[i], (IntPtr)(_data.ToInt64() + _twExtImageInfoSize + (_twInfoSize * i)), true);
             }
             return _data;
@@ -2999,7 +3158,8 @@ namespace Saraff.Twain {
     /// Provides image layout information in current units.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwImageLayout {
+    internal class TwImageLayout
+    {
 
         /// <summary>
         /// Frame coords within larger document.
@@ -3029,7 +3189,8 @@ namespace Saraff.Twain {
     /// Used with TwMSG.EndXfer to indicate additional data.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwPendingXfers {								// TW_PENDINGXFERS
+    internal class TwPendingXfers
+    {								// TW_PENDINGXFERS
         public ushort Count;
         public uint EOJ;
     }
@@ -3038,7 +3199,8 @@ namespace Saraff.Twain {
     /// Used by application to get/set capability from/in a data source.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwCapability : IDisposable {					// TW_CAPABILITY
+    internal class TwCapability : IDisposable
+    {					// TW_CAPABILITY
 
         /// <summary>
         /// Id of capability to set or get, e.g. TwCap.Brightness
@@ -3057,16 +3219,18 @@ namespace Saraff.Twain {
         /// </summary>
         public IntPtr Handle;
 
-        private TwCapability() {
+        private TwCapability()
+        {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TwCapability"/> class.
         /// </summary>
         /// <param name="cap">The cap.</param>
-        public TwCapability(TwCap cap) {
-            this.Cap = cap;
-            this.ConType = TwOn.DontCare;
+        public TwCapability(TwCap cap)
+        {
+            Cap = cap;
+            ConType = TwOn.DontCare;
         }
 
         /// <summary>
@@ -3075,10 +3239,12 @@ namespace Saraff.Twain {
         /// <param name="cap">The cap.</param>
         /// <param name="value">The value.</param>
         /// <param name="type">The type.</param>
-        public TwCapability(TwCap cap, uint value, TwType type) {
-            this.Cap = cap;
-            this.ConType = TwOn.One;
-            this._SetValue(new TwOneValue() {
+        public TwCapability(TwCap cap, uint value, TwType type)
+        {
+            Cap = cap;
+            ConType = TwOn.One;
+            _SetValue(new TwOneValue()
+            {
                 ItemType = type,
                 Item = value
             });
@@ -3090,17 +3256,21 @@ namespace Saraff.Twain {
         /// <param name="cap">The cap.</param>
         /// <param name="value">The value.</param>
         /// <param name="type">The type.</param>
-        public TwCapability(TwCap cap, string value, TwType type) {
-            this.Cap = cap;
-            this.ConType = TwOn.One;
+        public TwCapability(TwCap cap, string value, TwType type)
+        {
+            Cap = cap;
+            ConType = TwOn.One;
             int _twOneCustumValueSize = Marshal.SizeOf(typeof(TwOneCustumValue));
-            this.Handle = Twain32._Memory.Alloc(_twOneCustumValueSize + Marshal.SizeOf(TwTypeHelper.TypeOf(type)));
-            IntPtr _ptr = Twain32._Memory.Lock(this.Handle);
-            try {
+            Handle = Twain32._Memory.Alloc(_twOneCustumValueSize + Marshal.SizeOf(TwTypeHelper.TypeOf(type)));
+            IntPtr _ptr = Twain32._Memory.Lock(Handle);
+            try
+            {
                 Marshal.StructureToPtr(new TwOneCustumValue { ItemType = type }, _ptr, true);
                 Marshal.StructureToPtr(TwTypeHelper.CastToTw(type, value), (IntPtr)(_ptr.ToInt64() + _twOneCustumValueSize), true);
-            } finally {
-                Twain32._Memory.Unlock(this.Handle);
+            }
+            finally
+            {
+                Twain32._Memory.Unlock(Handle);
             }
         }
 
@@ -3109,10 +3279,11 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="cap">The cap.</param>
         /// <param name="range">The range.</param>
-        public TwCapability(TwCap cap, TwRange range) {
-            this.Cap = cap;
-            this.ConType = TwOn.Range;
-            this._SetValue(range);
+        public TwCapability(TwCap cap, TwRange range)
+        {
+            Cap = cap;
+            ConType = TwOn.Range;
+            _SetValue(range);
         }
 
         /// <summary>
@@ -3121,20 +3292,25 @@ namespace Saraff.Twain {
         /// <param name="cap">The cap.</param>
         /// <param name="array">The array.</param>
         /// <param name="arrayValue">The array value.</param>
-        public TwCapability(TwCap cap, TwArray array, object[] arrayValue) {
-            this.Cap = cap;
-            this.ConType = TwOn.Array;
+        public TwCapability(TwCap cap, TwArray array, object[] arrayValue)
+        {
+            Cap = cap;
+            ConType = TwOn.Array;
             int _twArraySize = Marshal.SizeOf(typeof(TwArray));
             int _twItemSize = Marshal.SizeOf(TwTypeHelper.TypeOf(array.ItemType));
-            this.Handle = Twain32._Memory.Alloc(_twArraySize + (_twItemSize * arrayValue.Length));
-            IntPtr _pTwArray = Twain32._Memory.Lock(this.Handle);
-            try {
+            Handle = Twain32._Memory.Alloc(_twArraySize + (_twItemSize * arrayValue.Length));
+            IntPtr _pTwArray = Twain32._Memory.Lock(Handle);
+            try
+            {
                 Marshal.StructureToPtr(array, _pTwArray, true);
-                for(long i = 0, _ptr = _pTwArray.ToInt64() + _twArraySize; i < arrayValue.Length; i++, _ptr += _twItemSize) {
+                for (long i = 0, _ptr = _pTwArray.ToInt64() + _twArraySize; i < arrayValue.Length; i++, _ptr += _twItemSize)
+                {
                     Marshal.StructureToPtr(TwTypeHelper.CastToTw(array.ItemType, arrayValue[i]), (IntPtr)_ptr, true);
                 }
-            } finally {
-                Twain32._Memory.Unlock(this.Handle);
+            }
+            finally
+            {
+                Twain32._Memory.Unlock(Handle);
             }
         }
 
@@ -3144,20 +3320,25 @@ namespace Saraff.Twain {
         /// <param name="cap">The cap.</param>
         /// <param name="enumeration">The enumeration.</param>
         /// <param name="enumerationValue">The enumeration value.</param>
-        public TwCapability(TwCap cap, TwEnumeration enumeration, object[] enumerationValue) {
-            this.Cap = cap;
-            this.ConType = TwOn.Enum;
+        public TwCapability(TwCap cap, TwEnumeration enumeration, object[] enumerationValue)
+        {
+            Cap = cap;
+            ConType = TwOn.Enum;
             int _twEnumerationSize = Marshal.SizeOf(typeof(TwEnumeration));
             int _twItemSize = Marshal.SizeOf(TwTypeHelper.TypeOf(enumeration.ItemType));
-            this.Handle = Twain32._Memory.Alloc(_twEnumerationSize + (_twItemSize * enumerationValue.Length));
-            IntPtr _pTwEnumeration = Twain32._Memory.Lock(this.Handle);
-            try {
+            Handle = Twain32._Memory.Alloc(_twEnumerationSize + (_twItemSize * enumerationValue.Length));
+            IntPtr _pTwEnumeration = Twain32._Memory.Lock(Handle);
+            try
+            {
                 Marshal.StructureToPtr(enumeration, _pTwEnumeration, true);
-                for(long i = 0, _ptr = _pTwEnumeration.ToInt64() + _twEnumerationSize; i < enumerationValue.Length; i++, _ptr += _twItemSize) {
+                for (long i = 0, _ptr = _pTwEnumeration.ToInt64() + _twEnumerationSize; i < enumerationValue.Length; i++, _ptr += _twItemSize)
+                {
                     Marshal.StructureToPtr(TwTypeHelper.CastToTw(enumeration.ItemType, enumerationValue[i]), (IntPtr)_ptr, true);
                 }
-            } finally {
-                Twain32._Memory.Unlock(this.Handle);
+            }
+            finally
+            {
+                Twain32._Memory.Unlock(Handle);
             }
         }
 
@@ -3166,10 +3347,13 @@ namespace Saraff.Twain {
         /// <para xml:lang="ru">Возвращает результат для указаной возможности.</para>
         /// </summary>
         /// <returns>Instance TwArray, TwEnumeration, _TwRange or _TwOneValue.<para xml:lang="ru">Экземпляр TwArray, TwEnumeration, _TwRange или _TwOneValue.</para></returns>
-        public object GetValue() {
-            IntPtr _ptr = Twain32._Memory.Lock(this.Handle);
-            try {
-                switch(this.ConType) {
+        public object GetValue()
+        {
+            IntPtr _ptr = Twain32._Memory.Lock(Handle);
+            try
+            {
+                switch (ConType)
+                {
                     case TwOn.Array:
                         return new __TwArray((TwArray)Marshal.PtrToStructure(_ptr, typeof(TwArray)), (IntPtr)(_ptr.ToInt64() + Marshal.SizeOf(typeof(TwArray))));
                     case TwOn.Enum:
@@ -3178,7 +3362,8 @@ namespace Saraff.Twain {
                         return Marshal.PtrToStructure(_ptr, typeof(TwRange));
                     case TwOn.One:
                         TwOneCustumValue _value = Marshal.PtrToStructure(_ptr, typeof(TwOneCustumValue)) as TwOneCustumValue;
-                        switch(_value.ItemType) {
+                        switch (_value.ItemType)
+                        {
                             case TwType.Str32:
                             case TwType.Str64:
                             case TwType.Str128:
@@ -3191,8 +3376,10 @@ namespace Saraff.Twain {
                         }
                 }
                 return null;
-            } finally {
-                Twain32._Memory.Unlock(this.Handle);
+            }
+            finally
+            {
+                Twain32._Memory.Unlock(Handle);
             }
         }
 
@@ -3201,34 +3388,43 @@ namespace Saraff.Twain {
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose() {
-            if(this.Handle != IntPtr.Zero) {
-                Twain32._Memory.Free(this.Handle);
-                this.Handle = IntPtr.Zero;
+        public void Dispose()
+        {
+            if (Handle != IntPtr.Zero)
+            {
+                Twain32._Memory.Free(Handle);
+                Handle = IntPtr.Zero;
             }
         }
 
         #endregion
 
-        private void _SetValue<T>(T value) {
-            this.Handle = Twain32._Memory.Alloc(Marshal.SizeOf(typeof(T)));
-            IntPtr _ptr = Twain32._Memory.Lock(this.Handle);
-            try {
+        private void _SetValue<T>(T value)
+        {
+            Handle = Twain32._Memory.Alloc(Marshal.SizeOf(typeof(T)));
+            IntPtr _ptr = Twain32._Memory.Lock(Handle);
+            try
+            {
                 Marshal.StructureToPtr(value, _ptr, true);
-            } finally {
-                Twain32._Memory.Unlock(this.Handle);
+            }
+            finally
+            {
+                Twain32._Memory.Unlock(Handle);
             }
         }
     }
 
-    internal interface ITwArray {
+    internal interface ITwArray
+    {
 
-        TwType ItemType {
+        TwType ItemType
+        {
             get;
             set;
         }
 
-        uint NumItems {
+        uint NumItems
+        {
             get;
             set;
         }
@@ -3238,29 +3434,24 @@ namespace Saraff.Twain {
     /// Container for array of values.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwArray : ITwArray {                                    //TWON_ARRAY. Container for array of values (a simplified TW_ENUMERATION)
+    internal class TwArray : ITwArray
+    {                                    //TWON_ARRAY. Container for array of values (a simplified TW_ENUMERATION)
         [MarshalAs(UnmanagedType.U2)]
         private TwType _itemType;
         private uint _numItems;    /* How many items in ItemList           */
         //[MarshalAs(UnmanagedType.ByValArray,SizeConst=1)]
         //public byte[] ItemList; /* Array of ItemType values starts here */
 
-        public TwType ItemType {
-            get {
-                return this._itemType;
-            }
-            set {
-                this._itemType = value;
-            }
+        public TwType ItemType
+        {
+            get => _itemType;
+            set => _itemType = value;
         }
 
-        public uint NumItems {
-            get {
-                return this._numItems;
-            }
-            set {
-                this._numItems = value;
-            }
+        public uint NumItems
+        {
+            get => _numItems;
+            set => _numItems = value;
         }
     }
 
@@ -3268,7 +3459,8 @@ namespace Saraff.Twain {
     /// Container for a collection of values.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwEnumeration : ITwArray {                              //TWON_ENUMERATION. Container for a collection of values.
+    internal class TwEnumeration : ITwArray
+    {                              //TWON_ENUMERATION. Container for a collection of values.
         [MarshalAs(UnmanagedType.U2)]
         private TwType _ItemType;
         private uint _numItems;     /* How many items in ItemList                 */
@@ -3277,40 +3469,28 @@ namespace Saraff.Twain {
         //[MarshalAs(UnmanagedType.ByValArray,SizeConst=1)]
         //public byte[] ItemList;  /* Array of ItemType values starts here       */
 
-        public TwType ItemType {
-            get {
-                return this._ItemType;
-            }
-            set {
-                this._ItemType = value;
-            }
+        public TwType ItemType
+        {
+            get => _ItemType;
+            set => _ItemType = value;
         }
 
-        public uint NumItems {
-            get {
-                return this._numItems;
-            }
-            set {
-                this._numItems = value;
-            }
+        public uint NumItems
+        {
+            get => _numItems;
+            set => _numItems = value;
         }
 
-        public uint CurrentIndex {
-            get {
-                return this._currentIndex;
-            }
-            set {
-                this._currentIndex = value;
-            }
+        public uint CurrentIndex
+        {
+            get => _currentIndex;
+            set => _currentIndex = value;
         }
 
-        public uint DefaultIndex {
-            get {
-                return this._defaultIndex;
-            }
-            set {
-                this._defaultIndex = value;
-            }
+        public uint DefaultIndex
+        {
+            get => _defaultIndex;
+            set => _defaultIndex = value;
         }
     }
 
@@ -3318,7 +3498,8 @@ namespace Saraff.Twain {
     /// Container for one value.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwOneValue {                                 //TW_ONEVALUE. Container for one value.
+    internal class TwOneValue
+    {                                 //TW_ONEVALUE. Container for one value.
         [MarshalAs(UnmanagedType.U2)]
         public TwType ItemType;
         public uint Item;
@@ -3328,7 +3509,8 @@ namespace Saraff.Twain {
     /// Container for one custom value.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwOneCustumValue {                                 //TW_ONEVALUE. Container for one value.
+    internal class TwOneCustumValue
+    {                                 //TW_ONEVALUE. Container for one value.
         [MarshalAs(UnmanagedType.U2)]
         public TwType ItemType;
     }
@@ -3337,7 +3519,8 @@ namespace Saraff.Twain {
     /// Container for a range of values.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwRange {                                    //TWON_RANGE. Container for a range of values.
+    internal class TwRange
+    {                                    //TWON_RANGE. Container for a range of values.
         [MarshalAs(UnmanagedType.U2)]
         public TwType ItemType;
         public uint MinValue;     /* Starting value in the range.           */
@@ -3351,7 +3534,8 @@ namespace Saraff.Twain {
     /// Sets up DS to application data transfer via a memory buffer.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwSetupMemXfer {
+    internal class TwSetupMemXfer
+    {
 
         /// <summary>
         /// Minimum buffer size in bytes
@@ -3373,11 +3557,13 @@ namespace Saraff.Twain {
     /// Used to pass image data (e.g. in strips) from DS to application.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwImageMemXfer {
+    internal class TwImageMemXfer
+    {
 
-        public TwImageMemXfer() {
-            this.Compression = (TwCompression)ushort.MaxValue;
-            this.BytesPerRow = this.BytesWritten = this.Columns = this.Rows = this.XOffset = this.YOffset = uint.MaxValue;
+        public TwImageMemXfer()
+        {
+            Compression = (TwCompression)ushort.MaxValue;
+            BytesPerRow = BytesWritten = Columns = Rows = XOffset = YOffset = uint.MaxValue;
         }
 
         /// <summary>
@@ -3426,7 +3612,8 @@ namespace Saraff.Twain {
     /// Used to manage memory buffers.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwMemory {
+    internal class TwMemory
+    {
 
         /// <summary>
         /// Any combination of the TWMF_ constants.
@@ -3449,7 +3636,8 @@ namespace Saraff.Twain {
     /// Sets up DS to application data transfer via a file.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwSetupFileXfer {
+    internal class TwSetupFileXfer
+    {
 
         /// <summary>
         /// File to contain data.
@@ -3472,7 +3660,8 @@ namespace Saraff.Twain {
     /// DAT_PALETTE8. Color palette when TWPT_PALETTE pixels xfer'd in mem buf.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwPalette8 {
+    internal class TwPalette8
+    {
 
         /// <summary>
         /// Number of colors in the color table.
@@ -3491,17 +3680,21 @@ namespace Saraff.Twain {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         public TwElement8[] Colors;
 
-        public static implicit operator Twain32.ColorPalette(TwPalette8 palette) {
+        public static implicit operator Twain32.ColorPalette(TwPalette8 palette)
+        {
             return Twain32.ColorPalette.Create(palette);
         }
 
-        public static implicit operator TwPalette8(Twain32.ColorPalette palette) {
-            TwPalette8 _result = new TwPalette8 {
+        public static implicit operator TwPalette8(Twain32.ColorPalette palette)
+        {
+            TwPalette8 _result = new TwPalette8
+            {
                 PaletteType = palette.PaletteType,
                 NumColors = (ushort)palette.Colors.Length,
                 Colors = new TwElement8[256]
             };
-            for(int i = 0; i < palette.Colors.Length; i++) {
+            for (int i = 0; i < palette.Colors.Length; i++)
+            {
                 _result.Colors[i] = palette.Colors[i];
             }
             return _result;
@@ -3513,7 +3706,8 @@ namespace Saraff.Twain {
     /// </summary>
     [DebuggerDisplay("RGB=({Channel1},{Channel2},{Channel3}), Index={Index}")]
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal struct TwElement8 {
+    internal struct TwElement8
+    {
 
         /// <summary>
         /// Value used to index into the color table.
@@ -3535,12 +3729,15 @@ namespace Saraff.Twain {
         /// </summary>
         public byte Channel3;
 
-        public static implicit operator Color(TwElement8 element) {
+        public static implicit operator Color(TwElement8 element)
+        {
             return Color.FromArgb(element.Channel1, element.Channel2, element.Channel3);
         }
 
-        public static implicit operator TwElement8(Color color) {
-            return new TwElement8 {
+        public static implicit operator TwElement8(Color color)
+        {
+            return new TwElement8
+            {
                 Channel1 = color.R,
                 Channel2 = color.G,
                 Channel3 = color.B
@@ -3552,7 +3749,8 @@ namespace Saraff.Twain {
     /// DAT_DEVICEEVENT, information about events.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwDeviceEvent {
+    internal class TwDeviceEvent
+    {
 
         /// <summary>
         /// One of the TWDE_xxxx values.
@@ -3617,7 +3815,8 @@ namespace Saraff.Twain {
     /// Used to register callbacks.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwCallback {
+    internal class TwCallback
+    {
 
         [MarshalAs(UnmanagedType.FunctionPtr)]
         public CallBackProc CallBackProc;
@@ -3631,7 +3830,8 @@ namespace Saraff.Twain {
     /// Used to register callbacks.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwCallback2 {
+    internal class TwCallback2
+    {
 
         [MarshalAs(UnmanagedType.FunctionPtr)]
         public CallBackProc CallBackProc;
@@ -3646,7 +3846,8 @@ namespace Saraff.Twain {
     /// </summary>
     /// <remarks>TW_CUSTOMDSDATA</remarks>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwCustomDSData {
+    internal class TwCustomDSData
+    {
 
         public uint InfoLength;
 
@@ -3660,28 +3861,35 @@ namespace Saraff.Twain {
 
     #region Internal Type Definitions
 
-    internal interface __ITwArray {
+    internal interface __ITwArray
+    {
 
-        TwType ItemType {
+        TwType ItemType
+        {
             get;
         }
 
-        uint NumItems {
+        uint NumItems
+        {
             get;
         }
 
-        object[] Items {
+        object[] Items
+        {
             get;
         }
     }
 
-    internal interface __ITwEnumeration : __ITwArray {
+    internal interface __ITwEnumeration : __ITwArray
+    {
 
-        int CurrentIndex {
+        int CurrentIndex
+        {
             get;
         }
 
-        int DefaultIndex {
+        int DefaultIndex
+        {
             get;
         }
     }
@@ -3689,58 +3897,43 @@ namespace Saraff.Twain {
     /// <summary>
     /// Container for array of values.
     /// </summary>
-    internal class __TwArray : __ITwArray {
+    internal class __TwArray : __ITwArray
+    {
         private ITwArray _data;
         private object[] _items;
 
-        internal __TwArray(ITwArray data, IntPtr items) {
-            this._data = data;
-            this._items = new object[this._data.NumItems];
-            for(long i = 0, _offset = 0, _sizeof = TwTypeHelper.SizeOf(this._data.ItemType); i < this._data.NumItems; i++, _offset += _sizeof) {
-                this._items[i] = TwTypeHelper.CastToCommon(this._data.ItemType, Marshal.PtrToStructure((IntPtr)(items.ToInt64() + _offset), TwTypeHelper.TypeOf(this._data.ItemType)));
+        internal __TwArray(ITwArray data, IntPtr items)
+        {
+            _data = data;
+            _items = new object[_data.NumItems];
+            for (long i = 0, _offset = 0, _sizeof = TwTypeHelper.SizeOf(_data.ItemType); i < _data.NumItems; i++, _offset += _sizeof)
+            {
+                _items[i] = TwTypeHelper.CastToCommon(_data.ItemType, Marshal.PtrToStructure((IntPtr)(items.ToInt64() + _offset), TwTypeHelper.TypeOf(_data.ItemType)));
             }
         }
 
-        public TwType ItemType {
-            get {
-                return this._data.ItemType;
-            }
-        }
+        public TwType ItemType => _data.ItemType;
 
-        public uint NumItems {
-            get {
-                return this._data.NumItems;
-            }
-        }
+        public uint NumItems => _data.NumItems;
 
-        public object[] Items {
-            get {
-                return this._items;
-            }
-        }
+        public object[] Items => _items;
     }
 
     /// <summary>
     /// Container for a collection of values.
     /// </summary>
-    internal class __TwEnumeration : __TwArray, __ITwEnumeration {
+    internal class __TwEnumeration : __TwArray, __ITwEnumeration
+    {
         private TwEnumeration _data;
 
-        internal __TwEnumeration(TwEnumeration data, IntPtr items) : base(data, items) {
-            this._data = data;
+        internal __TwEnumeration(TwEnumeration data, IntPtr items) : base(data, items)
+        {
+            _data = data;
         }
 
-        public int CurrentIndex {
-            get {
-                return (int)this._data.CurrentIndex;
-            }
-        }
+        public int CurrentIndex => (int)_data.CurrentIndex;
 
-        public int DefaultIndex {
-            get {
-                return (int)this._data.DefaultIndex;
-            }
-        }
+        public int DefaultIndex => (int)_data.DefaultIndex;
     }
 
     #endregion
@@ -3751,10 +3944,12 @@ namespace Saraff.Twain {
     /// DAT_ENTRYPOINT. returns essential entry points.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 2)]
-    internal class TwEntryPoint {
+    internal class TwEntryPoint
+    {
 
-        public TwEntryPoint() {
-            this.Size = Marshal.SizeOf(this);
+        public TwEntryPoint()
+        {
+            Size = Marshal.SizeOf(this);
         }
 
         /// <summary>

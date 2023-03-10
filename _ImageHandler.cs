@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
-namespace Saraff.Twain {
+namespace Saraff.Twain
+{
 
     /// <summary>
     /// Base class to processing of a acquired image.
     /// </summary>
     /// <seealso cref="Saraff.Twain.IImageHandler" />
-    internal abstract class _ImageHandler : IImageHandler {
+    internal abstract class _ImageHandler : IImageHandler
+    {
         private Dictionary<string, object> _state = null;
         private const string _ImagePointer = "ImagePointer";
 
@@ -24,13 +23,14 @@ namespace Saraff.Twain {
         /// <returns>
         /// Stream that contains data of a image.
         /// </returns>
-        public Stream PtrToStream(IntPtr ptr, IStreamProvider provider) {
-            this._state = new Dictionary<string, object> {
-                {_ImageHandler._ImagePointer, ptr}
+        public Stream PtrToStream(IntPtr ptr, IStreamProvider provider)
+        {
+            _state = new Dictionary<string, object> {
+                {_ImagePointer, ptr}
             };
 
             Stream _stream = provider != null ? provider.GetStream() : new MemoryStream();
-            this.PtrToStreamCore(ptr, _stream);
+            PtrToStreamCore(ptr, _stream);
             return _stream;
         }
 
@@ -41,14 +41,16 @@ namespace Saraff.Twain {
         /// </summary>
         /// <param name="ptr">The pointer to block of unmanaged memory.</param>
         /// <param name="provider">The provider of a streams.</param>
-        protected virtual void PtrToStreamCore(IntPtr ptr, Stream stream) {
+        protected virtual void PtrToStreamCore(IntPtr ptr, Stream stream)
+        {
             BinaryWriter _writer = new BinaryWriter(stream);
 
-            int _size = this.GetSize();
-            byte[] _buffer = new byte[this.BufferSize];
+            int _size = GetSize();
+            byte[] _buffer = new byte[BufferSize];
 
-            for(int _offset = 0, _len = 0; _offset < _size; _offset += _len) {
-                _len = Math.Min(this.BufferSize, _size - _offset);
+            for (int _offset = 0, _len = 0; _offset < _size; _offset += _len)
+            {
+                _len = Math.Min(BufferSize, _size - _offset);
                 Marshal.Copy((IntPtr)(ptr.ToInt64() + _offset), _buffer, 0, _len);
                 _writer.Write(_buffer, 0, _len);
             }
@@ -74,7 +76,7 @@ namespace Saraff.Twain {
         /// <value>
         /// The state of the handler.
         /// </value>
-        protected Dictionary<string, object> HandlerState => this._state;
+        protected Dictionary<string, object> HandlerState => _state;
 
         /// <summary>
         /// Gets the pointer to unmanaged memory that contain image data.
@@ -82,13 +84,14 @@ namespace Saraff.Twain {
         /// <value>
         /// The image pointer.
         /// </value>
-        protected IntPtr ImagePointer => (IntPtr)this.HandlerState[_ImageHandler._ImagePointer];
+        protected IntPtr ImagePointer => (IntPtr)HandlerState[_ImagePointer];
     }
 
     /// <summary>
     /// Provides processing of a acquired image.
     /// </summary>
-    public interface IImageHandler {
+    public interface IImageHandler
+    {
 
         /// <summary>
         /// Convert a block of unmanaged memory to stream.
@@ -102,7 +105,8 @@ namespace Saraff.Twain {
     /// <summary>
     /// Provides instances of the <see cref="System.IO.Stream"/> for data writing.
     /// </summary>
-    public interface IStreamProvider {
+    public interface IStreamProvider
+    {
 
         /// <summary>
         /// Gets the stream.
@@ -115,7 +119,8 @@ namespace Saraff.Twain {
     /// Provides image factory.
     /// </summary>
     /// <typeparam name="T">Type of image</typeparam>
-    public interface IImageFactory<T> {
+    public interface IImageFactory<T>
+    {
 
         /// <summary>
         /// Create and return instance of image.

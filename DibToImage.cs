@@ -28,33 +28,32 @@
  * 
  * PLEASE SEND EMAIL TO:  twain@saraff.ru.
  */
-using System;
+
 using System.Runtime.InteropServices;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection;
-using System.Collections.Generic;
 
 
-namespace Saraff.Twain {
+namespace Saraff.Twain
+{
 
-    internal sealed class DibToImage : _ImageHandler {
+    internal sealed class DibToImage : _ImageHandler
+    {
 
         /// <summary>
         /// Convert a block of unmanaged memory to stream.
         /// </summary>
         /// <param name="ptr">The pointer to block of unmanaged memory.</param>
         /// <param name="stream"></param>
-        protected override void PtrToStreamCore(IntPtr ptr, Stream stream) {
+        protected override void PtrToStreamCore(IntPtr ptr, Stream stream)
+        {
             BinaryWriter _writer = new BinaryWriter(stream);
 
             #region BITMAPFILEHEADER
 
-            BITMAPINFOHEADER _header = this.Header;
+            BITMAPINFOHEADER _header = Header;
 
             _writer.Write((ushort)0x4d42);
-            _writer.Write(14 + this.GetSize());
+            _writer.Write(14 + GetSize());
             _writer.Write(0);
             _writer.Write(14 + _header.biSize + (_header.ClrUsed << 2));
 
@@ -74,19 +73,22 @@ namespace Saraff.Twain {
         /// <returns>
         /// Size of a image data.
         /// </returns>
-        protected override int GetSize() {
-            if(!this.HandlerState.ContainsKey("DIBSIZE")) {
-                BITMAPINFOHEADER _header = this.Header;
+        protected override int GetSize()
+        {
+            if (!HandlerState.ContainsKey("DIBSIZE"))
+            {
+                BITMAPINFOHEADER _header = Header;
 
                 int _extra = 0;
-                if(_header.biCompression == 0) {
+                if (_header.biCompression == 0)
+                {
                     int _bytesPerRow = ((_header.biWidth * _header.biBitCount) >> 3);
                     _extra = Math.Max(_header.biHeight * (_bytesPerRow + ((_bytesPerRow & 0x3) != 0 ? 4 - _bytesPerRow & 0x3 : 0)) - _header.biSizeImage, 0);
                 }
 
-                this.HandlerState.Add("DIBSIZE", _header.biSize + _header.biSizeImage + _extra + (_header.ClrUsed << 2));
+                HandlerState.Add("DIBSIZE", _header.biSize + _header.biSizeImage + _extra + (_header.ClrUsed << 2));
             }
-            return (int)this.HandlerState["DIBSIZE"];
+            return (int)HandlerState["DIBSIZE"];
         }
 
         /// <summary>
@@ -97,17 +99,21 @@ namespace Saraff.Twain {
         /// </value>
         protected override int BufferSize => 256 * 1024; //256K
 
-        private BITMAPINFOHEADER Header {
-            get {
-                if(!this.HandlerState.ContainsKey("BITMAPINFOHEADER")) {
-                    this.HandlerState.Add("BITMAPINFOHEADER", Marshal.PtrToStructure(this.ImagePointer, typeof(BITMAPINFOHEADER)));
+        private BITMAPINFOHEADER Header
+        {
+            get
+            {
+                if (!HandlerState.ContainsKey("BITMAPINFOHEADER"))
+                {
+                    HandlerState.Add("BITMAPINFOHEADER", Marshal.PtrToStructure(ImagePointer, typeof(BITMAPINFOHEADER)));
                 }
-                return this.HandlerState["BITMAPINFOHEADER"] as BITMAPINFOHEADER;
+                return HandlerState["BITMAPINFOHEADER"] as BITMAPINFOHEADER;
             }
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 2)]
-        private class BITMAPINFOHEADER {
+        private class BITMAPINFOHEADER
+        {
             public int biSize;
             public int biWidth;
             public int biHeight;
@@ -120,9 +126,9 @@ namespace Saraff.Twain {
             public int biClrUsed;
             public int biClrImportant;
 
-            public int ClrUsed => this.IsRequiredCreateColorTable ? 1 << this.biBitCount : this.biClrUsed;
+            public int ClrUsed => IsRequiredCreateColorTable ? 1 << biBitCount : biClrUsed;
 
-            public bool IsRequiredCreateColorTable => this.biClrUsed == 0 && this.biBitCount <= 8;
+            public bool IsRequiredCreateColorTable => biClrUsed == 0 && biBitCount <= 8;
         }
     }
 }

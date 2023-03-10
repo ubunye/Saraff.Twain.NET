@@ -28,30 +28,32 @@
  * 
  * PLEASE SEND EMAIL TO:  twain@saraff.ru.
  */
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 using System.Reflection;
-using System.Drawing;
 using System.Diagnostics;
 
-namespace Saraff.Twain {
+namespace Saraff.Twain
+{
 
     /// <summary>
     /// A set of capabilities
     /// <para xml:lang="ru">Набор возможностей (Capabilities).</para>
     /// </summary>
     [DebuggerDisplay("SupportedCaps = {SupportedCaps.Get().Count}")]
-    public sealed class TwainCapabilities : MarshalByRefObject {
+    public sealed class TwainCapabilities : MarshalByRefObject
+    {
         private Dictionary<TwCap, Type> _caps = new Dictionary<TwCap, Type>();
 
-        internal TwainCapabilities(Twain32 twain) {
+        internal TwainCapabilities(Twain32 twain)
+        {
             MethodInfo _сreateCapability = typeof(TwainCapabilities).GetMethod("CreateCapability", BindingFlags.Instance | BindingFlags.NonPublic);
-            foreach(PropertyInfo _prop in typeof(TwainCapabilities).GetProperties()) {
+            foreach (PropertyInfo _prop in typeof(TwainCapabilities).GetProperties())
+            {
                 object[] _attrs = _prop.GetCustomAttributes(typeof(CapabilityAttribute), false);
-                if(_attrs.Length > 0) {
+                if (_attrs.Length > 0)
+                {
                     CapabilityAttribute _attr = _attrs[0] as CapabilityAttribute;
-                    this._caps.Add(_attr.Cap, _prop.PropertyType);
+                    _caps.Add(_attr.Cap, _prop.PropertyType);
                     _prop.SetValue(this, _сreateCapability.MakeGenericMethod(_prop.PropertyType.GetGenericArguments()[0]).Invoke(this, new object[] { twain, _attr.Cap }), null);
                 }
             }
@@ -1115,35 +1117,41 @@ namespace Saraff.Twain {
         #endregion
 
         [DebuggerDisplay("{ToString()}")]
-        private class Capability<T> : ICapability<T>, ICapability2<T> {
+        private class Capability<T> : ICapability<T>, ICapability2<T>
+        {
 
-            public Capability(Twain32 twain, TwCap cap) {
-                this._Twain32 = twain;
-                this._Cap = cap;
+            public Capability(Twain32 twain, TwCap cap)
+            {
+                _Twain32 = twain;
+                _Cap = cap;
             }
 
-            public Twain32.Enumeration Get() => this.ToEnumeration(this._Twain32.GetCap(this._Cap));
+            public Twain32.Enumeration Get() => ToEnumeration(_Twain32.GetCap(_Cap));
 
-            public T GetCurrent() => (T)this._Twain32.GetCurrentCap(this._Cap);
+            public T GetCurrent() => (T)_Twain32.GetCurrentCap(_Cap);
 
-            public object[] GetCurrentArray() => this.ToEnumeration(this._Twain32.GetCurrentCap(this._Cap)).Items;
+            public object[] GetCurrentArray() => ToEnumeration(_Twain32.GetCurrentCap(_Cap)).Items;
 
-            public T GetDefault() => (T)this._Twain32.GetDefaultCap(this._Cap);
+            public T GetDefault() => (T)_Twain32.GetDefaultCap(_Cap);
 
-            public object[] GetDefaultArray() => this.ToEnumeration(this._Twain32.GetDefaultCap(this._Cap)).Items;
+            public object[] GetDefaultArray() => ToEnumeration(_Twain32.GetDefaultCap(_Cap)).Items;
 
-            public void Set(T value) {
-                if(this._Twain32.Capabilities._caps[this._Cap] == typeof(ICapability2<T>) || !this.GetCurrent().Equals(value)) {
-                    this._Twain32.SetCap(this._Cap, value);
+            public void Set(T value)
+            {
+                if (_Twain32.Capabilities._caps[_Cap] == typeof(ICapability2<T>) || !GetCurrent().Equals(value))
+                {
+                    _Twain32.SetCap(_Cap, value);
                 }
             }
 
-            public void Set(params T[] value) {
+            public void Set(params T[] value)
+            {
                 var _val = new object[value.Length];
-                for(var i = 0; i < _val.Length; i++) {
+                for (var i = 0; i < _val.Length; i++)
+                {
                     _val[i] = value[i];
                 }
-                this._Twain32.SetCap(this._Cap, _val);
+                _Twain32.SetCap(_Cap, _val);
             }
 
             /// <summary>
@@ -1151,19 +1159,21 @@ namespace Saraff.Twain {
             /// <para xml:lang="ru">Устанавливает ограничение на значения указанной возможности.</para>
             /// </summary>
             /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
-            public void SetConstraint(T value) => this._Twain32.SetConstraintCap(this._Cap, value);
+            public void SetConstraint(T value) => _Twain32.SetConstraintCap(_Cap, value);
 
             /// <summary>
             /// Sets a limit on the values of the specified feature.
             /// <para xml:lang="ru">Устанавливает ограничение на значения указанной возможности.</para>
             /// </summary>
             /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
-            public void SetConstraint(params T[] value) {
+            public void SetConstraint(params T[] value)
+            {
                 var _val = new object[value.Length];
-                for(var i = 0; i < _val.Length; i++) {
+                for (var i = 0; i < _val.Length; i++)
+                {
                     _val[i] = value[i];
                 }
-                this._Twain32.SetConstraintCap(this._Cap, _val);
+                _Twain32.SetConstraintCap(_Cap, _val);
             }
 
             /// <summary>
@@ -1171,11 +1181,13 @@ namespace Saraff.Twain {
             /// <para xml:lang="ru">Устанавливает ограничение на значения указанной возможности.</para>
             /// </summary>
             /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
-            public void SetConstraint(Twain32.Range value) {
-                if(value.CurrentValue.GetType() != typeof(T)) {
+            public void SetConstraint(Twain32.Range value)
+            {
+                if (value.CurrentValue.GetType() != typeof(T))
+                {
                     throw new ArgumentException();
                 }
-                this._Twain32.SetConstraintCap(this._Cap, value);
+                _Twain32.SetConstraintCap(_Cap, value);
             }
 
             /// <summary>
@@ -1183,42 +1195,49 @@ namespace Saraff.Twain {
             /// <para xml:lang="ru">Устанавливает ограничение на значения указанной возможности.</para>
             /// </summary>
             /// <param name="value">The value to set.<para xml:lang="ru">Устанавливаемое значение.</para></param>
-            public void SetConstraint(Twain32.Enumeration value) {
-                if(value.Items == null || value.Items.Length == 0 || value.Items[0].GetType() != typeof(T)) {
+            public void SetConstraint(Twain32.Enumeration value)
+            {
+                if (value.Items == null || value.Items.Length == 0 || value.Items[0].GetType() != typeof(T))
+                {
                     throw new ArgumentException();
                 }
-                this._Twain32.SetConstraintCap(this._Cap, value);
+                _Twain32.SetConstraintCap(_Cap, value);
             }
 
-            public void Reset() => this._Twain32.ResetCap(this._Cap);
+            public void Reset() => _Twain32.ResetCap(_Cap);
 
-            public TwQC IsSupported() => this._Twain32.IsCapSupported(this._Cap);
+            public TwQC IsSupported() => _Twain32.IsCapSupported(_Cap);
 
-            public bool IsSupported(TwQC operation) => (this.IsSupported() & operation) == operation;
+            public bool IsSupported(TwQC operation) => (IsSupported() & operation) == operation;
 
             protected Twain32 _Twain32 { get; private set; }
 
             protected TwCap _Cap { get; private set; }
 
-            private Twain32.Enumeration ToEnumeration(object value) {
+            private Twain32.Enumeration ToEnumeration(object value)
+            {
                 Twain32.Enumeration _val = Twain32.Enumeration.FromObject(value);
-                for(int i = 0; i < _val.Count; i++) {
+                for (int i = 0; i < _val.Count; i++)
+                {
                     _val[i] = typeof(T).IsEnum ? (T)_val[i] : Convert.ChangeType(_val[i], typeof(T));
                 }
                 return _val;
             }
 
-            public override string ToString() {
-                var _supported = this.IsSupported();
-                return string.Format("{0}, {1}{2}{3}{4}", this._Cap, _supported == 0 ? "Not Supported" : "", (_supported & TwQC.GetCurrent) != 0 ? string.Format("Current = {0}, ", this.GetCurrent()) : "", (_supported & TwQC.GetDefault) != 0 ? string.Format("Default = {0}, ", this.GetDefault()) : "", _supported != 0 ? string.Format("Supported = {{{0}}}", this.IsSupported()) : "");
+            public override string ToString()
+            {
+                var _supported = IsSupported();
+                return string.Format("{0}, {1}{2}{3}{4}", _Cap, _supported == 0 ? "Not Supported" : "", (_supported & TwQC.GetCurrent) != 0 ? string.Format("Current = {0}, ", GetCurrent()) : "", (_supported & TwQC.GetDefault) != 0 ? string.Format("Default = {0}, ", GetDefault()) : "", _supported != 0 ? string.Format("Supported = {{{0}}}", IsSupported()) : "");
             }
         }
 
         [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-        private sealed class CapabilityAttribute : Attribute {
+        private sealed class CapabilityAttribute : Attribute
+        {
 
-            public CapabilityAttribute(TwCap cap) {
-                this.Cap = cap;
+            public CapabilityAttribute(TwCap cap)
+            {
+                Cap = cap;
             }
 
             public TwCap Cap { get; private set; }
@@ -1230,7 +1249,8 @@ namespace Saraff.Twain {
     /// <para xml:lang="ru">Представляет возможность (Capability).</para>
     /// </summary>
     /// <typeparam name="T">Тип.</typeparam>
-    public interface ICapability<T> {
+    public interface ICapability<T>
+    {
 
         /// <summary>
         /// Returns capability values.
@@ -1315,7 +1335,8 @@ namespace Saraff.Twain {
     /// <para xml:lang="ru">Представляет возможность (Capability).</para>
     /// </summary>
     /// <typeparam name="T">Тип.</typeparam>
-    public interface ICapability2<T> {
+    public interface ICapability2<T>
+    {
 
         /// <summary>
         /// Returns the capability values.
